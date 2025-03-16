@@ -1,0 +1,26 @@
+services:
+    elasticsearch:
+        image: 'docker.elastic.co/elasticsearch/elasticsearch:7.17.10'
+        container_name: soundify-elasticsearch
+        environment:
+            - 'ELASTIC_PASSWORD=secret'
+            - 'discovery.type=single-node'
+            - 'xpack.security.enabled=false'
+        ports:
+            - '9200'
+            - '9300'
+    mysql:
+        image: 'mysql:latest'
+        container_name: soundify-mysql
+        environment:
+            - 'MYSQL_DATABASE=mydatabase'
+            - 'MYSQL_PASSWORD=secret'
+            - 'MYSQL_ROOT_PASSWORD=verysecret'
+            - 'MYSQL_USER=myuser'
+        ports:
+            - '3306'
+    redis:
+        image: 'redis:latest'
+        container_name: soundify_redis
+        ports:
+            - '6379'
