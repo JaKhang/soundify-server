@@ -1,0 +1,64 @@
+server:
+    port: ${SERVER_PORT:8080}  # Default to 8080 if not set
+
+spring:
+    application:
+        name: soundify
+    datasource:
+        url: jdbc:mysql://${MYSQL_HOST:soundify-mysql}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:soundify_database}
+        username: ${MYSQL_USER:soundify}
+        password: ${MYSQL_PASSWORD:soundify.com}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        hikari:
+            maximum-pool-size: 10
+            minimum-idle: 2
+            idle-timeout: 60000
+            max-lifetime: 1800000
+            connection-timeout: 30000
+
+    jpa:
+        hibernate:
+            ddl-auto: ${HIBERNATE_DDL_AUTO:update}
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQL8Dialect
+                format_sql: true
+                show_sql: ${HIBERNATE_SHOW_SQL:true}
+
+    elasticsearch:
+        uris: ${ELASTICSEARCH_URI:http://soundify-elasticsearch:9200}
+
+    mail:
+        host: ${MAIL_HOST:localhost}
+        port: ${MAIL_PORT:1025}
+        username: ${MAIL_USERNAME:}
+        password: ${MAIL_PASSWORD:}
+        properties:
+            mail:
+                smtp:
+                    auth: false
+                    starttls:
+                        enable: false
+    data:
+        redis:
+            host: ${REDIS_HOST:soundify-redis}
+            port: ${REDIS_PORT:6379}
+    minio:
+        endpoint: ${MINIO_ENDPOINT:http://soundify-minio:9000}
+        access-key: ${MINIO_ACCESS_KEY:soundify}
+        secret-key: ${MINIO_SECRET_KEY:soundify}
+
+logging:
+    level:
+        root: ${LOG_LEVEL:INFO}
+        org.springframework.web: ${WEB_LOG_LEVEL:DEBUG}
+        org.hibernate.SQL: ${HIBERNATE_LOG_LEVEL:DEBUG}
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health,info,metrics
+    health:
+        elasticsearch:
+            enabled: true

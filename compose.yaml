@@ -1,26 +1,101 @@
+version: '3.8'
+
 services:
     elasticsearch:
         image: 'docker.elastic.co/elasticsearch/elasticsearch:7.17.10'
         container_name: soundify-elasticsearch
         environment:
-            - 'ELASTIC_PASSWORD=secret'
+            - 'ELASTIC_PASSWORD=soundify-elasticsearch'
             - 'discovery.type=single-node'
             - 'xpack.security.enabled=false'
+        networks:
+            - soundify-net
         ports:
-            - '9200'
-            - '9300'
+            - '9200:9200'
+            - '9300:9300'
+
     mysql:
         image: 'mysql:latest'
         container_name: soundify-mysql
+        networks:
+            - soundify-net
         environment:
-            - 'MYSQL_DATABASE=mydatabase'
-            - 'MYSQL_PASSWORD=secret'
-            - 'MYSQL_ROOT_PASSWORD=verysecret'
-            - 'MYSQL_USER=myuser'
+            - 'MYSQL_DATABASE=soundify_database'
+            - 'MYSQL_USER=soundify'
+            - 'MYSQL_PASSWORD=soundify.com'
+            - 'MYSQL_ROOT_PASSWORD=root'
+            - 'MYSQL_ALLOW_EMPTY_PASSWORD=no'
+            - 'MYSQL_AUTHENTICATION_PLUGIN=mysql_native_password'
         ports:
-            - '3306'
+            - '3306:3306'
+        volumes:
+            - mysql-data:/var/lib/mysql  # Persistent MySQL storage
+
     redis:
         image: 'redis:latest'
-        container_name: soundify_redis
+        container_name: soundify-redis
+        networks:
+            - soundify-net
         ports:
-            - '6379'
+            - '6379:6379'
+        volumes:
+            - redis-data:/data  # Persistent Redis storage
+
+    mail-dev:
+        container_name: soundify-mail-dev
+        image: maildev/maildev
+        networks:
+            - soundify-net
+        ports:
+            - '1080:1080'
+            - '1025:1025'
+
+    minio:
+        image: minio/minio
+        container_name: soundify-minio
+        networks:
+            - soundify-net
+        ports:
+            - '9000:9000'
+            - '9001:9001'
+        volumes:
+            - ./storage:/data  # MinIO persistent storage
+        environment:
+            - MINIO_ROOT_USER=soundify
+            - MINIO_ROOT_PASSWORD=soundify
+        command: server --console-address ":9001" /data
+    backend:
+        container_name: soundify-app
+        build:
+            context: .  # Assuming Dockerfile is in the root directory
+            dockerfile: Dockerfile
+        depends_on:
+            - mysql
+            - redis
+            - elasticsearch
+            - minio
+        networks:
+            - soundify-net
+        environment:
+            - SPRING_DATASOURCE_URL=jdbc:mysql://soundify-mysql:3306/soundify_database
+            - SPRING_DATASOURCE_USERNAME=soundify
+            - SPRING_DATASOURCE_PASSWORD=soundify.com
+            - SPRING_REDIS_HOST=soundify-redis
+            - SPRING_REDIS_PORT=6379
+            - SPRING_ELASTICSEARCH_URIS=http://soundify-elasticsearch:9200
+            - SPRING_MINIO_ENDPOINT=http://soundify-minio:9000
+            - SPRING_MINIO_ACCESS_KEY=soundify
+            - SPRING_MINIO_SECRET_KEY=soundify
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./logs:/app/logs  # Persist logs outside the container
+
+
+networks:
+    soundify-net:
+        driver: bridge
+
+volumes:
+    mysql-data:   # Volume for MySQL persistence
+    redis-data:   # Volume for Redis persistence
