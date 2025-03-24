@@ -10,7 +10,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -61,6 +61,8 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'com.github.ua-parser:uap-java:1.6.1'
     implementation 'com.github.kokorin.jaffree:jaffree:2024.08.29'
+    implementation "io.minio:minio:8.5.12"
+
 
 }
 

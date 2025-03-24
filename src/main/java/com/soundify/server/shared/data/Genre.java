@@ -1,5 +1,8 @@
 package com.soundify.server.shared.data;
 
+import lombok.Getter;
+
+@Getter
 public enum Genre {
     POP("pop"),
     ROCK("rock"),
@@ -48,10 +51,6 @@ public enum Genre {
 
     Genre(String value) {
         this.value = value;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     public static Genre fromValue(String value) {

@@ -1,5 +1,8 @@
 package com.soundify.server.shared.data;
 
+import lombok.Getter;
+
+@Getter
 public enum AlbumType {
     COMPILATION("compilation"),
     ALBUM("album"),
@@ -9,10 +12,6 @@ public enum AlbumType {
 
     AlbumType(String value) {
         this.value = value;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     public static AlbumType fromValue(String value) {
