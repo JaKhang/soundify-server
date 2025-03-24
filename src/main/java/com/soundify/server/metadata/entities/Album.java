@@ -9,6 +9,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -18,24 +20,30 @@ import java.util.*;
 @Table(name = "album_metadata")
 @Getter
 public class Album extends AbstractEntity {
+    @Column(nullable = false)
     String name;
+    @Column(nullable = false)
     LocalDateTime releaseDate;
     @Enumerated(EnumType.STRING)
     AlbumType type;
     String label;
+    @ColumnDefault("0")
     int popularity;
     @ManyToMany
+    @JoinTable(name = "album_artist", joinColumns = @JoinColumn(name = "album_id"), inverseJoinColumns = @JoinColumn(name = "artist_id"))
     List<Artist> artists = new ArrayList<>();
+    @Column(nullable = false)
     Locale locale;
     @ElementCollection
     Set<Locale> notAvailableLocales = Set.of();
-    @OneToMany
+    @OneToMany(mappedBy = "album")
     List<Track> tracks = new ArrayList<>();
+    @ColumnDefault("false")
     boolean explicit;
     @ElementCollection
     Set<Genre> genres = new HashSet<>();
     @ElementCollection
-    Set<Image> images = new HashSet<>();
+    Set<Image> image = new HashSet<>();
     @ElementCollection
     Set<Copyright> copyrights = new HashSet<>();
 }

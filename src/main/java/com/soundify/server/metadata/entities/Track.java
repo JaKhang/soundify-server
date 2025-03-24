@@ -7,24 +7,33 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @FieldDefaults(level = AccessLevel.PACKAGE)
 @Entity
 @Table(name = "track_metadata")
 @Getter
 public class Track extends AbstractEntity {
+
     long duration;
     boolean explicit;
     boolean playable;
-    boolean popularity;
+    int popularity;
+
+    @Column(nullable = false)
     String name;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "album_id")
     Album album;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "track_artist", joinColumns = @JoinColumn(name = "track_id"), inverseJoinColumns = @JoinColumn(name = "artist_id"))
     List<Artist> tracks = new ArrayList<>();
 
+    @ElementCollection
+    Set<String> genres = new HashSet<>();
 
 }
