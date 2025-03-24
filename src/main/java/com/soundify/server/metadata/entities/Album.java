@@ -4,8 +4,10 @@ import com.soundify.server.shared.data.AlbumType;
 import com.soundify.server.shared.data.Copyright;
 import com.soundify.server.shared.data.Genre;
 import com.soundify.server.shared.data.Image;
+import com.soundify.server.shared.domain.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
@@ -14,8 +16,8 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PACKAGE)
 @Entity
 @Table(name = "album_metadata")
-public class Album {
-
+@Getter
+public class Album extends AbstractEntity {
     String name;
     LocalDateTime releaseDate;
     @Enumerated(EnumType.STRING)
@@ -34,7 +36,6 @@ public class Album {
     Set<Genre> genres = new HashSet<>();
     @ElementCollection
     Set<Image> images = new HashSet<>();
-
     @ElementCollection
     Set<Copyright> copyrights = new HashSet<>();
 }

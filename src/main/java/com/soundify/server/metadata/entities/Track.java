@@ -1,17 +1,30 @@
 package com.soundify.server.metadata.entities;
 
-import jakarta.persistence.Entity;
+import com.soundify.server.shared.domain.AbstractEntity;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@FieldDefaults(level = AccessLevel.PACKAGE)
 @Entity
-public class Track {
+@Table(name = "track_metadata")
+@Getter
+public class Track extends AbstractEntity {
     long duration;
     boolean explicit;
     boolean playable;
     boolean popularity;
     String name;
+    @ManyToOne
     Album album;
+
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(name = "track_artist", joinColumns = @JoinColumn(name = "track_id"), inverseJoinColumns = @JoinColumn(name = "artist_id"))
     List<Artist> tracks = new ArrayList<>();
+
+
 }
