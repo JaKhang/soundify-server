@@ -5,7 +5,7 @@ spring:
     application:
         name: soundify
     datasource:
-        url: jdbc:mysql://${MYSQL_HOST:soundify-mysql}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:soundify_database}
+        url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:soundify_database}
         username: ${MYSQL_USER:soundify}
         password: ${MYSQL_PASSWORD:soundify.com}
         driver-class-name: com.mysql.cj.jdbc.Driver
@@ -26,7 +26,7 @@ spring:
                 show_sql: ${HIBERNATE_SHOW_SQL:true}
 
     elasticsearch:
-        uris: ${ELASTICSEARCH_URI:http://soundify-elasticsearch:9200}
+        uris: ${ELASTICSEARCH_URI:http://localhost:9200}
 
     mail:
         host: ${MAIL_HOST:localhost}
