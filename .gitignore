@@ -1,38 +1,76 @@
-HELP.md
-.gradle
-.gradle/*
+# Gradle
+.gradle/
 build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+out/
 bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+!gradle-wrapper.jar
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+# IntelliJ IDEA
+.idea/
 *.iml
 *.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
+*.iws
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+# Eclipse
+.settings/
+.project
+.classpath
+*.launch
+bin/
 
-### VS Code ###
+# VSCode
 .vscode/
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Spring Boot
+/target/
+!src/main/resources/application.properties
+!src/main/resources/application.yml
+
+# Dependency directories
+**/lib/
+**/libs/
+
+# Mac OS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Environment files
+.env
+*.env
+
+# Application properties
+**/application-*.properties
+**/application-*.yml
+
+# Compiled class files
+*.class
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Maven (if you're using Maven alongside Gradle)
+target/
+pom.xml
+pom.xml.asc
+*.releaseBackup
+
+# Gradle Wrapper
+gradle-wrapper.properties
+
+# Local configuration files
+*.orig
+*.bak
+
+# Other
+*.swp
+*.swo
+*~
