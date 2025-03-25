@@ -10,7 +10,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -43,7 +42,7 @@ public class Album extends AbstractEntity {
     @ElementCollection
     Set<Genre> genres = new HashSet<>();
     @ElementCollection
-    Set<Image> image = new HashSet<>();
+    Set<Image> images = new HashSet<>();
     @ElementCollection
     Set<Copyright> copyrights = new HashSet<>();
 }

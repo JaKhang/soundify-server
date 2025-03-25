@@ -25,7 +25,7 @@ public class Artist extends AbstractEntity {
     String name;
 
     @ElementCollection
-    Set<Image> image;
+    Set<Image> images;
 
     @ElementCollection
     Set<Genre> genres;

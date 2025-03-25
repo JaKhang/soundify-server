@@ -1,5 +1,6 @@
 package com.soundify.server.metadata.entities;
 
+import com.soundify.server.shared.data.Genre;
 import com.soundify.server.shared.domain.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -31,9 +32,9 @@ public class Track extends AbstractEntity {
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "track_artist", joinColumns = @JoinColumn(name = "track_id"), inverseJoinColumns = @JoinColumn(name = "artist_id"))
-    List<Artist> tracks = new ArrayList<>();
+    List<Artist> artists = new ArrayList<>();
 
     @ElementCollection
-    Set<String> genres = new HashSet<>();
+    Set<Genre> genres = new HashSet<>();
 
 }
