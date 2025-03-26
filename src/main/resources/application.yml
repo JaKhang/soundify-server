@@ -44,9 +44,10 @@ spring:
             host: ${REDIS_HOST:soundify-redis}
             port: ${REDIS_PORT:6379}
     minio:
-        endpoint: ${MINIO_ENDPOINT:http://soundify-minio:9000}
-        access-key: ${MINIO_ACCESS_KEY:soundify}
-        secret-key: ${MINIO_SECRET_KEY:soundify}
+        endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+        access-key: ${MINIO_ACCESS_KEY:DOGCyj3Y4pWYI0yWXnc2}
+        secret-key: ${MINIO_SECRET_KEY:alJFm5wPPYLR3BHxfgQaPX9MFgjce4JCf3cnuQcz}
+
 
 logging:
     level:
