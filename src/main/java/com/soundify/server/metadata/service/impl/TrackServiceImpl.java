@@ -5,6 +5,8 @@ import com.soundify.server.metadata.mappers.TrackMapper;
 import com.soundify.server.metadata.repositories.TrackRepository;
 import com.soundify.server.metadata.service.TrackService;
 import com.soundify.server.shared.domain.Id;
+import com.soundify.server.shared.exceptions.ErrorCode;
+import com.soundify.server.shared.exceptions.NotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +24,6 @@ public class TrackServiceImpl implements TrackService {
         // Throw temp exception
         return trackMapper.toTrackResponse(trackRepository
                         .findById(id)
-                        .orElseThrow(() -> new RuntimeException("Track not found")));
+                        .orElseThrow(() -> new NotFoundException("Track not found", ErrorCode.NOT_FOUND)));
     }
 }
