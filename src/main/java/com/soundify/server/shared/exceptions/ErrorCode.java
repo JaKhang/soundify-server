@@ -9,8 +9,8 @@ public enum ErrorCode {
         UNAUTHORIZED(1001, HttpStatus.UNAUTHORIZED, "Unauthorized access"),
         FORBIDDEN(1002, HttpStatus.FORBIDDEN, "Forbidden action"),
         NOT_FOUND(1003, HttpStatus.NOT_FOUND, "Resource not found"),
-        INTERNAL_SERVER_ERROR(1004, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
-
+        INTERNAL_SERVER_ERROR(1004, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
+        TOKEN_INVALID(1005, HttpStatus.UNAUTHORIZED, "Invalid or expired token"); // ✅ Fixed
         private final int code;
         private final HttpStatus status;
         private final String message;
