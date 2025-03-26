@@ -26,7 +26,6 @@ public class WebGlobalConfig implements WebMvcConfigurer {
 
     @Bean
     public SimpleModule simpleModule(){
-        // Create a new module
         SimpleModule module = new SimpleModule();
 
         // Register the custom serializer and deserializer for Date class
@@ -36,7 +35,6 @@ public class WebGlobalConfig implements WebMvcConfigurer {
     }
     @Bean
     public Parser parser(){
-        // Create a new module
         return new Parser();
 
     }
