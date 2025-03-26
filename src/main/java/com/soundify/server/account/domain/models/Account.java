@@ -2,9 +2,11 @@ package com.soundify.server.account.domain.models;
 
 import com.soundify.server.account.domain.events.DeviceRegisteredEvent;
 import com.soundify.server.account.domain.events.DeviceUnregisteredEvent;
+import com.soundify.server.account.domain.events.PasswordChangedEvent;
 import com.soundify.server.account.domain.events.ProfileUpdatedEvent;
 import com.soundify.server.shared.domain.AggregateRoot;
 import com.soundify.server.shared.domain.Id;
+import com.soundify.server.shared.exceptions.SystemException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -13,10 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "account")
@@ -47,6 +46,13 @@ public class Account extends AggregateRoot {
     private Provider provider;
 
     private LocalDateTime verifiedAt;
+
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<Token> verificationTokens = new HashSet<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<Token> resetPasswordTokens = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
@@ -126,9 +132,25 @@ public class Account extends AggregateRoot {
             isUpdated = true;
         }
 
-        // ✅ Publish event only if changes were made
         if (isUpdated) {
             registerEvents(new ProfileUpdatedEvent(this.getId().toString(), this.displayName, this.avatar, this.dateOfBirth, this.gender));
         }
+    }
+
+    // Verify token and mark account as verified
+    public boolean verifyEmail(String tokenValue) {
+//        if (isVerified()) {
+//            throw new SystemException()
+//        }
+        Iterator<Token> iterator = verificationTokens.iterator();
+        while (iterator.hasNext()) {
+            Token token = iterator.next();
+            if (token.value().equals(tokenValue) && token.isValid()) {
+                this.verifiedAt = LocalDateTime.now();
+                iterator.remove(); // Remove token after use
+                return true;
+            }
+        }
+        return false;
     }
 }

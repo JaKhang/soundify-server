@@ -1,4 +1,4 @@
-package com.soundify.server.account.domain.models;
+package com.soundify.server.account.domain.events;
 
 import com.soundify.server.shared.domain.DomainEvent;
 
