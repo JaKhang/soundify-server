@@ -19,8 +19,7 @@ import java.util.Objects;
 @JavaTypeRegistration(javaType = Id.class, descriptorClass = IdJavaType.class)
 public abstract class AbstractEntity{
 
-    @EmbeddedId
-    @AttributeOverride(name = "value", column = @Column(name = "id"))
+    @jakarta.persistence.Id
     protected Id id;
     @CreatedDate
     protected LocalDateTime createdAt;
