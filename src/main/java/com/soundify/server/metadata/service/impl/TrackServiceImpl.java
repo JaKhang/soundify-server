@@ -48,7 +48,7 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public void update(String id, TrackRequest trackRequest) {
-        trackRepository.save(trackMapper.toTrack(id, trackRequest, albumRepository, artistRepository));
+        trackRepository.save(trackMapper.toTrack(trackRequest, albumRepository, artistRepository));
     }
 
     @Override

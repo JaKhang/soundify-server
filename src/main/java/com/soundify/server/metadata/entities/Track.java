@@ -5,6 +5,7 @@ import com.soundify.server.shared.domain.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PACKAGE)
 @Entity
 @Table(name = "track_metadata")
-@Getter
+@Getter @Setter
 public class Track extends AbstractEntity {
 
     long duration;

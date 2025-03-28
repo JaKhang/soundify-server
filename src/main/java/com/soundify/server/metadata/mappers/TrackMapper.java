@@ -23,40 +23,31 @@ public interface TrackMapper {
 
     List<TrackResponse> toTrackResponses(List<Track> tracks);
 
+    @Mapping(source = "id", target = "id", qualifiedByName = "stringToId")
     @Mapping(source = "albumId", target = "album", qualifiedByName = "albumIdToAlbum")
     @Mapping(source = "artistIds", target = "artists", qualifiedByName = "artistIdsToArtists")
     Track toTrack(TrackRequest trackRequest,
                   @Context AlbumRepository albumRepository,
                   @Context ArtistRepository artistRepository);
 
-    @Mapping(target = "id", source = "id", qualifiedByName = "stringToId")
-    @Mapping(source = "albumId", target = "album", qualifiedByName = "albumIdToAlbum")
-    @Mapping(source = "artistIds", target = "artists", qualifiedByName = "artistIdsToArtists")
-    Track toTrack(String id,
-                  TrackRequest trackRequest,
-                  @Context AlbumRepository albumRepository,
-                  @Context ArtistRepository artistRepository);
-
     @Named("albumIdToAlbum")
     default Album albumIdToAlbum(Id albumId, @Context AlbumRepository albumRepository) {
-        if (albumId != null) {
-            return albumRepository
-                    .findById(albumId)
-                    .orElseThrow(() -> new NotFoundException("Album not found"));
-        }
-        throw new BadRequestException("Album must be included");
+        if (albumId == null) throw new BadRequestException("Album must be included");
+        return albumRepository
+                .findById(albumId)
+                .orElseThrow(() -> new NotFoundException("Album not found"));
+
     }
 
     @Named("artistIdsToArtists")
     default List<Artist> artistIdsToArtists(List<Id> artistIds, @Context ArtistRepository artistRepository) {
-        if (artistIds != null && !artistIds.isEmpty()) {
-            return artistRepository.findAllById(artistIds);
-        }
-        throw new NotFoundException("Artist must be included");
+        if (artistIds == null || !artistIds.isEmpty()) throw new NotFoundException("Artist must be included");
+        return artistRepository.findAllById(artistIds);
     }
 
     @Named("stringToId")
     default Id stringToId(String id) {
+        if (id == null) return null;
         return Id.from(id);
     }
 }

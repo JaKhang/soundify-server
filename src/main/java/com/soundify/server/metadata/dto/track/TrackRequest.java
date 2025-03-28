@@ -9,11 +9,13 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
-public record TrackRequest(@NotBlank String name,
+public record TrackRequest(String id,
+                           @NotBlank String name,
                            long duration,
                            boolean explicit,
                            boolean playable,
                            int popularity,
                            @NotNull Id albumId,
                            @NotEmpty List<Id> artistIds,
-                           @NotEmpty Set<Genre> genres) {}
+                           @NotEmpty Set<Genre> genres) {
+}
