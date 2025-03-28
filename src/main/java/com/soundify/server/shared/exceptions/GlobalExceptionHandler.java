@@ -44,4 +44,12 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(404, HttpStatus.NOT_FOUND.value(), error.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
+        log.warn("Bad request: {}", ex.getMessage());
+        ErrorCode error = ex.getErrorCode();
+        ErrorResponse response = new ErrorResponse(400, HttpStatus.BAD_REQUEST.value(), error.getMessage(), null);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }
