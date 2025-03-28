@@ -4,6 +4,7 @@ import com.soundify.server.shared.persistence.IdJavaType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JavaTypeRegistration;
 import org.springframework.data.annotation.CreatedDate;
@@ -16,6 +17,7 @@ import java.util.Objects;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Getter
+@SuperBuilder
 @JavaTypeRegistration(javaType = Id.class, descriptorClass = IdJavaType.class)
 public abstract class AbstractEntity{
 
