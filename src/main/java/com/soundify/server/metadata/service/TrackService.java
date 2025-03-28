@@ -10,6 +10,6 @@ public interface TrackService {
     TrackResponse getById(Id id);
     List<TrackResponse> getByIds(List<Id> ids);
     String create(TrackRequest trackRequest);
-    void update(String id, TrackRequest trackRequest);
+    void update(TrackRequest trackRequest);
     void delete(String id);
 }

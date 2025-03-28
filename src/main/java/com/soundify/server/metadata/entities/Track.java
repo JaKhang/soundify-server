@@ -3,9 +3,7 @@ package com.soundify.server.metadata.entities;
 import com.soundify.server.shared.data.Genre;
 import com.soundify.server.shared.domain.AbstractEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.ArrayList;
@@ -15,8 +13,11 @@ import java.util.Set;
 
 @FieldDefaults(level = AccessLevel.PACKAGE)
 @Entity
+@Builder
 @Table(name = "track_metadata")
-@Getter @Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Track extends AbstractEntity {
 
     long duration;

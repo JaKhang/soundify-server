@@ -1,7 +1,9 @@
 package com.soundify.server.metadata.service.impl;
 
+import com.soundify.server.metadata.converter.impl.TrackConverter;
 import com.soundify.server.metadata.dto.track.TrackRequest;
 import com.soundify.server.metadata.dto.track.TrackResponse;
+import com.soundify.server.metadata.entities.Track;
 import com.soundify.server.metadata.mappers.TrackMapper;
 import com.soundify.server.metadata.repositories.AlbumRepository;
 import com.soundify.server.metadata.repositories.ArtistRepository;
@@ -25,6 +27,7 @@ public class TrackServiceImpl implements TrackService {
     AlbumRepository albumRepository;
     ArtistRepository artistRepository;
     TrackMapper trackMapper;
+    TrackConverter trackConverter;
 
     @Override
     public TrackResponse getById(Id id) {
@@ -41,14 +44,15 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public String create(TrackRequest trackRequest) {
-        Id cid = trackRepository.save(trackMapper.toTrack(trackRequest, albumRepository, artistRepository))
-                .getId();
-        return cid.toString();
+        Track track = trackConverter.toEntity(trackRequest);
+        Id savedCid = trackRepository.save(track).getId();
+        return savedCid.toString();
     }
 
     @Override
-    public void update(String id, TrackRequest trackRequest) {
-        trackRepository.save(trackMapper.toTrack(trackRequest, albumRepository, artistRepository));
+    public void update(TrackRequest trackRequest) {
+        Track track = trackConverter.toEntity(trackRequest);
+        trackRepository.save(track);
     }
 
     @Override

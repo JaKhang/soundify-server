@@ -55,10 +55,10 @@ public class TrackApi {
         return ResponseEntity.created(uri).body(new ApiResponse<>(201, "Created Success", null));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/")
     @ResponseBody
-    public ResponseEntity<ApiResponse<Void>> updateTrack(@PathVariable String id, @RequestBody @Valid TrackRequest trackRequest) {
-        trackService.update(id, trackRequest);
+    public ResponseEntity<ApiResponse<Void>> updateTrack(@RequestBody @Valid TrackRequest trackRequest) {
+        trackService.update(trackRequest);
         return ResponseEntity.ok(new ApiResponse<>(200, "Updated Success", null));
     }
 
