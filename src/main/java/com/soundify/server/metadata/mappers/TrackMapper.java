@@ -7,8 +7,8 @@ import com.soundify.server.metadata.entities.Artist;
 import com.soundify.server.metadata.entities.Track;
 import com.soundify.server.metadata.repositories.AlbumRepository;
 import com.soundify.server.metadata.repositories.ArtistRepository;
-import com.soundify.server.metadata.repositories.TrackRepository;
 import com.soundify.server.shared.domain.Id;
+import com.soundify.server.shared.exceptions.BadRequestException;
 import com.soundify.server.shared.exceptions.NotFoundException;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -23,9 +23,17 @@ public interface TrackMapper {
 
     List<TrackResponse> toTrackResponses(List<Track> tracks);
 
-    @Mapping(source = "albumId", target = "track.album", qualifiedByName = "albumIdToAlbum")
-    @Mapping(source = "artistIds", target = "track.artists", qualifiedByName = "artistIdsToArtists")
+    @Mapping(source = "albumId", target = "album", qualifiedByName = "albumIdToAlbum")
+    @Mapping(source = "artistIds", target = "artists", qualifiedByName = "artistIdsToArtists")
     Track toTrack(TrackRequest trackRequest,
+                  @Context AlbumRepository albumRepository,
+                  @Context ArtistRepository artistRepository);
+
+    @Mapping(target = "id", source = "id", qualifiedByName = "stringToId")
+    @Mapping(source = "albumId", target = "album", qualifiedByName = "albumIdToAlbum")
+    @Mapping(source = "artistIds", target = "artists", qualifiedByName = "artistIdsToArtists")
+    Track toTrack(String id,
+                  TrackRequest trackRequest,
                   @Context AlbumRepository albumRepository,
                   @Context ArtistRepository artistRepository);
 
@@ -36,7 +44,7 @@ public interface TrackMapper {
                     .findById(albumId)
                     .orElseThrow(() -> new NotFoundException("Album not found"));
         }
-        throw new NotFoundException("Album not found");
+        throw new BadRequestException("Album must be included");
     }
 
     @Named("artistIdsToArtists")
@@ -44,6 +52,11 @@ public interface TrackMapper {
         if (artistIds != null && !artistIds.isEmpty()) {
             return artistRepository.findAllById(artistIds);
         }
-        throw new NotFoundException("Artists not found");
+        throw new NotFoundException("Artist must be included");
+    }
+
+    @Named("stringToId")
+    default Id stringToId(String id) {
+        return Id.from(id);
     }
 }

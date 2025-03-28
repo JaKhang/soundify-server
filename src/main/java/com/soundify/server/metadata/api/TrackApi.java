@@ -52,14 +52,20 @@ public class TrackApi {
                 .path("/api/v1/tracks/{id}")
                 .buildAndExpand(id)
                 .toUri();
-        return ResponseEntity.created(uri).body(new ApiResponse<>(201, "Created", null));
+        return ResponseEntity.created(uri).body(new ApiResponse<>(201, "Created Success", null));
     }
 
     @PutMapping("/{id}")
     @ResponseBody
     public ResponseEntity<ApiResponse<Void>> updateTrack(@PathVariable String id, @RequestBody @Valid TrackRequest trackRequest) {
-        Id cid = Id.from(id);
-        trackService.update(trackRequest);
-        return ResponseEntity.ok(new ApiResponse<>(200, "Success", null));
+        trackService.update(id, trackRequest);
+        return ResponseEntity.ok(new ApiResponse<>(200, "Updated Success", null));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> deleteTrack(@PathVariable String id) {
+        trackService.delete(id);
+        return ResponseEntity.ok(new ApiResponse<>(200, "Deleted Success", null));
     }
 }
