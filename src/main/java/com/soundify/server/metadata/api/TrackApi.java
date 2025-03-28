@@ -1,16 +1,19 @@
-package com.soundify.server.metadata.controller;
+package com.soundify.server.metadata.api;
 
 import com.soundify.server.metadata.dto.ApiResponse;
 import com.soundify.server.metadata.dto.track.TrackRequest;
 import com.soundify.server.metadata.dto.track.TrackResponse;
 import com.soundify.server.metadata.service.TrackService;
 import com.soundify.server.shared.domain.Id;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -20,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/tracks")
-public class TrackController {
+public class TrackApi {
     TrackService trackService;
 
     @GetMapping("/{id}")
@@ -42,8 +45,21 @@ public class TrackController {
 
     @PostMapping("/")
     @ResponseBody
-    public ResponseEntity<ApiResponse<Void>> createTrack(@RequestBody TrackRequest trackRequest) {
-        trackService.create(trackRequest);
+    public ResponseEntity<ApiResponse<Void>> createTrack(@RequestBody @Valid TrackRequest trackRequest, UriComponentsBuilder uriBuilder) {
+        String id = trackService.create(trackRequest);
+        // Create URI and attach to header
+        URI uri = uriBuilder
+                .path("/api/v1/tracks/{id}")
+                .buildAndExpand(id)
+                .toUri();
+        return ResponseEntity.created(uri).body(new ApiResponse<>(201, "Created", null));
+    }
+
+    @PutMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> updateTrack(@PathVariable String id, @RequestBody @Valid TrackRequest trackRequest) {
+        Id cid = Id.from(id);
+        trackService.update(trackRequest);
         return ResponseEntity.ok(new ApiResponse<>(200, "Success", null));
     }
 }

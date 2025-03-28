@@ -1,4 +1,4 @@
-package com.soundify.server.metadata.controller;
+package com.soundify.server.metadata.api;
 
 import com.soundify.server.metadata.dto.album.AlbumResponse;
 import lombok.AccessLevel;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/albums")
-public class AlbumController {
+public class AlbumApi {
     @GetMapping(value = "/{id}")
     public AlbumResponse getAlbumById(@PathVariable String id) {
         return null;
