@@ -7,7 +7,8 @@ import com.soundify.server.metadata.entities.Artist;
 import com.soundify.server.metadata.entities.Track;
 import com.soundify.server.metadata.repositories.AlbumRepository;
 import com.soundify.server.metadata.repositories.ArtistRepository;
-import com.soundify.server.shared.exceptions.NotFoundException;
+import com.soundify.server.shared.domain.Id;
+import com.soundify.server.shared.exceptions.ResourceNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,10 +26,15 @@ public class TrackConverter implements Converter<Track, TrackRequest> {
     @Override
     public Track toEntity(TrackRequest request) {
         Album album = albumRepository.findById(request.albumId())
-                .orElseThrow(() -> new NotFoundException("Album not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Album not found"));
         List<Artist> artists = artistRepository.findAllById(request.artistIds());
 
+        if (artists.size() != request.artistIds().size()) {
+            throw new ResourceNotFoundException("Some artists in list are not exists");
+        }
+
         return Track.builder()
+                .id(Id.from(request.id()))
                 .name(request.name())
                 .duration(request.duration())
                 .explicit(request.explicit())

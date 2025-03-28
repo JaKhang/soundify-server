@@ -4,7 +4,7 @@ import com.soundify.server.metadata.converter.Converter;
 import com.soundify.server.metadata.entities.Album;
 import com.soundify.server.metadata.repositories.AlbumRepository;
 import com.soundify.server.shared.domain.Id;
-import com.soundify.server.shared.exceptions.NotFoundException;
+import com.soundify.server.shared.exceptions.ResourceNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,7 +19,7 @@ public class AlbumConverter implements Converter<Album, Id> {
     @Override
     public Album toEntity(Id id) {
         return albumRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Album not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Album not found"));
     }
 
     @Override

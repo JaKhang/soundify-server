@@ -10,7 +10,7 @@ import com.soundify.server.metadata.repositories.ArtistRepository;
 import com.soundify.server.metadata.repositories.TrackRepository;
 import com.soundify.server.metadata.service.TrackService;
 import com.soundify.server.shared.domain.Id;
-import com.soundify.server.shared.exceptions.NotFoundException;
+import com.soundify.server.shared.exceptions.ResourceNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class TrackServiceImpl implements TrackService {
         // Throw temp exception
         return trackMapper.toTrackResponse(trackRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException("Track not found")));
+                .orElseThrow(() -> new ResourceNotFoundException("Track not found")));
     }
 
     @Override

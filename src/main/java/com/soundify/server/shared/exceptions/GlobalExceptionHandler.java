@@ -36,20 +36,4 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(500, HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred", null);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
-        log.warn("Resource not found: {}", ex.getMessage());
-        ErrorCode error = ex.getErrorCode();
-        ErrorResponse response = new ErrorResponse(404, HttpStatus.NOT_FOUND.value(), error.getMessage(), null);
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
-        log.warn("Bad request: {}", ex.getMessage());
-        ErrorCode error = ex.getErrorCode();
-        ErrorResponse response = new ErrorResponse(400, HttpStatus.BAD_REQUEST.value(), error.getMessage(), null);
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
 }

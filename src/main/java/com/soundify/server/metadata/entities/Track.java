@@ -5,6 +5,7 @@ import com.soundify.server.shared.domain.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,7 +14,7 @@ import java.util.Set;
 
 @FieldDefaults(level = AccessLevel.PACKAGE)
 @Entity
-@Builder
+@SuperBuilder
 @Table(name = "track_metadata")
 @Getter
 @NoArgsConstructor
