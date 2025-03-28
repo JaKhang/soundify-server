@@ -1,5 +1,7 @@
 package com.soundify.server.metadata.controller;
 
+import com.soundify.server.metadata.dto.ApiResponse;
+import com.soundify.server.metadata.dto.track.TrackRequest;
 import com.soundify.server.metadata.dto.track.TrackResponse;
 import com.soundify.server.metadata.service.TrackService;
 import com.soundify.server.shared.domain.Id;
@@ -9,6 +11,11 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @RestController
@@ -16,9 +23,27 @@ import org.springframework.web.bind.annotation.*;
 public class TrackController {
     TrackService trackService;
 
-    @GetMapping(value = "/{id}")
+    @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<TrackResponse> getTrackById(@PathVariable Id id) {
-        return ResponseEntity.ok(trackService.getById(id));
+    public ResponseEntity<ApiResponse<TrackResponse>> getTrackById(@PathVariable String id) {
+        Id cid = Id.from(id);
+        return ResponseEntity.ok(new ApiResponse<>(200, "Success", trackService.getById(cid)));
+    }
+
+    @GetMapping("/list/{ids}")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<List<TrackResponse>>> getTrackByIds(@PathVariable String ids) {
+        String[] decodeIds = URLDecoder.decode(ids, StandardCharsets.UTF_8).split(",");
+        List<Id> cids = Arrays.stream(decodeIds)
+                .map(Id::from)
+                .toList();
+        return ResponseEntity.ok(new ApiResponse<>(200, "Success", trackService.getByIds(cids)));
+    }
+
+    @PostMapping("/")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Void>> createTrack(@RequestBody TrackRequest trackRequest) {
+        trackService.create(trackRequest);
+        return ResponseEntity.ok(new ApiResponse<>(200, "Success", null));
     }
 }

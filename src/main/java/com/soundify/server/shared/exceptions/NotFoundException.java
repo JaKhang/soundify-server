@@ -3,11 +3,9 @@ package com.soundify.server.shared.exceptions;
 import lombok.Getter;
 
 @Getter
-public class NotFoundException extends RuntimeException {
-    private final ErrorCode errorCode;
+public class NotFoundException extends SystemException {
 
-    public NotFoundException(String message, ErrorCode errorCode) {
-        super(message);
-        this.errorCode = errorCode;
+    public NotFoundException(String message) {
+        super(message,ErrorCode.NOT_FOUND);
     }
 }
