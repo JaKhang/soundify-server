@@ -1,12 +1,11 @@
 package com.soundify.server.account.domain.models;
 
-import com.soundify.server.account.domain.events.DeviceRegisteredEvent;
-import com.soundify.server.account.domain.events.DeviceUnregisteredEvent;
-import com.soundify.server.account.domain.events.PasswordChangedEvent;
-import com.soundify.server.account.domain.events.ProfileUpdatedEvent;
+import com.soundify.server.account.domain.events.*;
+import com.soundify.server.shared.data.Image;
 import com.soundify.server.shared.domain.AggregateRoot;
 import com.soundify.server.shared.domain.Id;
-import com.soundify.server.shared.exceptions.SystemException;
+import com.soundify.server.shared.exceptions.AuthenticationException;
+import com.soundify.server.shared.exceptions.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -17,8 +16,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+
 @Entity
-@Table(name = "account")
+@Table(name = "accounts")
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Account extends AggregateRoot {
@@ -33,7 +33,10 @@ public class Account extends AggregateRoot {
     private String password;
 
     private String displayName;
-    private String avatar;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "account_avatars", joinColumns = @JoinColumn(name = "account_id"))
+    private List<Image> avatar = new ArrayList<>();
 
     private LocalDate dateOfBirth;
 
@@ -47,12 +50,13 @@ public class Account extends AggregateRoot {
 
     private LocalDateTime verifiedAt;
 
-
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Token> verificationTokens = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Token> resetPasswordTokens = new HashSet<>();
+
+    private Token authenticationToken;
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
@@ -66,11 +70,7 @@ public class Account extends AggregateRoot {
     private AccountStatus status;
 
     public Device registerDevice(String os, String ip, String platform) {
-        if (this.devices.stream().anyMatch(d -> d.getIp().equals(ip))) {
-            throw new IllegalStateException("Device with this IP is already registered.");
-        }
-
-        Device device = new Device(Id.fast() ,os, ip, platform, LocalDateTime.now(), this);
+        Device device = new Device(Id.fast(), os, ip, platform, LocalDateTime.now(), this);
         this.devices.add(device);
         registerEvents(new DeviceRegisteredEvent(this.getId().toString(), os, ip, platform, device.getLoginAt()));
         return device;
@@ -86,27 +86,20 @@ public class Account extends AggregateRoot {
         registerEvents(new DeviceUnregisteredEvent(this.getId().toString(), id));
     }
 
-
     public void changePassword(String currentPassword, String newPassword, PasswordEncoder passwordEncoder) {
         if (newPassword == null || newPassword.length() < 8) {
             throw new IllegalArgumentException("New password must be at least 8 characters long.");
         }
 
-        // Verify current password
         if (!passwordEncoder.matches(currentPassword, this.password)) {
             throw new IllegalArgumentException("Current password is incorrect.");
         }
 
-        // Encrypt and update password
         this.password = passwordEncoder.encode(newPassword);
-
-        // Publish event
         registerEvents(new PasswordChangedEvent(this.getId().toString()));
     }
 
-
-
-    public void updateProfile(String newDisplayName, String newAvatarUrl, LocalDate newDateOfBirth, Gender newGender) {
+    public void updateProfile(String newDisplayName, List<Image> newAvatars, LocalDate newDateOfBirth, Gender newGender) {
         boolean isUpdated = false;
 
         if (newDisplayName != null && !newDisplayName.isBlank()) {
@@ -114,11 +107,8 @@ public class Account extends AggregateRoot {
             isUpdated = true;
         }
 
-        if (newAvatarUrl != null && !newAvatarUrl.isBlank()) {
-            if (!newAvatarUrl.startsWith("http://") && !newAvatarUrl.startsWith("https://")) {
-                throw new IllegalArgumentException("Invalid avatar URL format.");
-            }
-            this.avatar = newAvatarUrl;
+        if (newAvatars != null && !newAvatars.isEmpty()) {
+            this.avatar = newAvatars;
             isUpdated = true;
         }
 
@@ -137,20 +127,52 @@ public class Account extends AggregateRoot {
         }
     }
 
-    // Verify token and mark account as verified
-    public boolean verifyEmail(String tokenValue) {
-//        if (isVerified()) {
-//            throw new SystemException()
-//        }
+    public void verifyEmail(String tokenValue) {
+        if (isVerified()) {
+            throw new AuthenticationException(ErrorCode.INVALID_REQUEST);
+        }
         Iterator<Token> iterator = verificationTokens.iterator();
         while (iterator.hasNext()) {
             Token token = iterator.next();
             if (token.value().equals(tokenValue) && token.isValid()) {
                 this.verifiedAt = LocalDateTime.now();
-                iterator.remove(); // Remove token after use
-                return true;
+                iterator.remove();
+                registerEvents(new AccountVerifedEvent(id, username, email, this.verifiedAt));
+                return;
             }
         }
-        return false;
+        throw new AuthenticationException(ErrorCode.TOKEN_INVALID);
+    }
+
+    public void AuthenticateByToken(String tokenValue) {
+        if (authenticationToken != null && authenticationToken.value().equals(tokenValue)) {
+            authenticationToken = null;
+            return;
+        }
+        throw new AuthenticationException(ErrorCode.TOKEN_INVALID);
+    }
+
+    public void addVerificationToken(String tokenValue, int age) {
+        verificationTokens.add(new Token(tokenValue, LocalDateTime.now(), age));
+        registerEvents(new VerifyTokenAddedEvent(getId(), email, tokenValue, age));
+    }
+
+    public void addResetPasswordToken(String tokenValue, int age) {
+        resetPasswordTokens.add(new Token(tokenValue, LocalDateTime.now(), age));
+        registerEvents(new ResetPasswordTokenAddedEvent(getId(), email, tokenValue, age));
+    }
+
+    public void setAuthenticationToken(String value, int age) {
+        authenticationToken = new Token(value, LocalDateTime.now(), age);
+        registerEvents(new AuthenticationTokenAddedEvent(getId(), email, value, age));
+    }
+
+    private boolean isVerified() {
+        return verifiedAt != null;
+    }
+
+    public void changeAvatar(List<Image> avatar) {
+        this.avatar = avatar;
+        registerEvents(new AvatarChangedEvents(this.getId(), avatar));
     }
 }

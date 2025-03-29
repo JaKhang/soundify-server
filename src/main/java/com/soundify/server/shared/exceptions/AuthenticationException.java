@@ -1,7 +1,7 @@
 package com.soundify.server.shared.exceptions;
 
 public class AuthenticationException extends SystemException {
-    protected AuthenticationException(ErrorCode errorCode) {
+    public AuthenticationException(ErrorCode errorCode) {
         super(errorCode);
     }
 
