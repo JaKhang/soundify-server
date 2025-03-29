@@ -7,7 +7,6 @@ import com.soundify.server.metadata.entities.Artist;
 import com.soundify.server.metadata.entities.Track;
 import com.soundify.server.metadata.repositories.AlbumRepository;
 import com.soundify.server.metadata.repositories.ArtistRepository;
-import com.soundify.server.shared.domain.Id;
 import com.soundify.server.shared.exceptions.ResourceNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,7 @@ public class TrackConverter implements Converter<Track, TrackRequest> {
         }
 
         return Track.builder()
-                .id(Id.from(request.id()))
+                .id(request.id())
                 .name(request.name())
                 .duration(request.duration())
                 .explicit(request.explicit())

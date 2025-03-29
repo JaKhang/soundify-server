@@ -1,5 +1,6 @@
 package com.soundify.server.metadata.entities;
 
+import com.soundify.server.metadata.converter.LocaleConverter;
 import com.soundify.server.shared.data.AlbumType;
 import com.soundify.server.shared.data.Copyright;
 import com.soundify.server.shared.data.Genre;
@@ -32,8 +33,10 @@ public class Album extends AbstractEntity {
     @JoinTable(name = "album_artist", joinColumns = @JoinColumn(name = "album_id"), inverseJoinColumns = @JoinColumn(name = "artist_id"))
     List<Artist> artists = new ArrayList<>();
     @Column(nullable = false)
+    @Convert(converter = LocaleConverter.class)
     Locale locale;
     @ElementCollection
+    @Convert(converter = LocaleConverter.class)
     Set<Locale> notAvailableLocales = Set.of();
     @OneToMany(mappedBy = "album")
     List<Track> tracks = new ArrayList<>();

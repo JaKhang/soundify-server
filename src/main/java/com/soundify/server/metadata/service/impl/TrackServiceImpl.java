@@ -5,8 +5,6 @@ import com.soundify.server.metadata.dto.track.TrackRequest;
 import com.soundify.server.metadata.dto.track.TrackResponse;
 import com.soundify.server.metadata.entities.Track;
 import com.soundify.server.metadata.mappers.TrackMapper;
-import com.soundify.server.metadata.repositories.AlbumRepository;
-import com.soundify.server.metadata.repositories.ArtistRepository;
 import com.soundify.server.metadata.repositories.TrackRepository;
 import com.soundify.server.metadata.service.TrackService;
 import com.soundify.server.shared.domain.Id;
@@ -24,8 +22,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TrackServiceImpl implements TrackService {
     TrackRepository trackRepository;
-    AlbumRepository albumRepository;
-    ArtistRepository artistRepository;
     TrackMapper trackMapper;
     TrackConverter trackConverter;
 

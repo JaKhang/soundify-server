@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -28,19 +25,14 @@ public class TrackApi {
 
     @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<ApiResponse<TrackResponse>> getTrackById(@PathVariable String id) {
-        Id cid = Id.from(id);
-        return ResponseEntity.ok(new ApiResponse<>(200, "Success", trackService.getById(cid)));
+    public ResponseEntity<ApiResponse<TrackResponse>> getTrackById(@PathVariable Id id) {
+        return ResponseEntity.ok(new ApiResponse<>(200, "Success", trackService.getById(id)));
     }
 
-    @GetMapping("/list/{ids}")
+    @GetMapping
     @ResponseBody
-    public ResponseEntity<ApiResponse<List<TrackResponse>>> getTrackByIds(@PathVariable String ids) {
-        String[] decodeIds = URLDecoder.decode(ids, StandardCharsets.UTF_8).split(",");
-        List<Id> cids = Arrays.stream(decodeIds)
-                .map(Id::from)
-                .toList();
-        return ResponseEntity.ok(new ApiResponse<>(200, "Success", trackService.getByIds(cids)));
+    public ResponseEntity<ApiResponse<List<TrackResponse>>> getTrackByIds(@RequestParam List<Id> ids) {
+        return ResponseEntity.ok(new ApiResponse<>(200, "Success", trackService.getByIds(ids)));
     }
 
     @PostMapping("/")

@@ -1,5 +1,6 @@
 package com.soundify.server.metadata.entities;
 
+import com.soundify.server.metadata.converter.LocaleConverter;
 import com.soundify.server.shared.data.Image;
 import com.soundify.server.shared.domain.AbstractEntity;
 import jakarta.persistence.*;
@@ -19,12 +20,13 @@ import java.util.Set;
 public class Category extends AbstractEntity {
 
     @ElementCollection
-    Set<Image> icon = new HashSet<Image>();
+    Set<Image> icon = new HashSet<>();
 
     @Column(nullable = false)
     String name;
 
     @Column
+    @Convert(converter = LocaleConverter.class)
     Locale locale;
 
     @ManyToMany

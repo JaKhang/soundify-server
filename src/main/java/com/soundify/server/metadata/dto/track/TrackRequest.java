@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
-public record TrackRequest(String id,
+public record TrackRequest(Id id,
                            @NotBlank String name,
                            long duration,
                            boolean explicit,

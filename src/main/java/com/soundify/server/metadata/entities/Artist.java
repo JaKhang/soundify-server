@@ -1,12 +1,10 @@
 package com.soundify.server.metadata.entities;
 
+import com.soundify.server.metadata.converter.LocaleConverter;
 import com.soundify.server.shared.data.Genre;
 import com.soundify.server.shared.data.Image;
 import com.soundify.server.shared.domain.AbstractEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -37,5 +35,6 @@ public class Artist extends AbstractEntity {
     int followers;
 
     @Column(nullable = false)
+    @Convert(converter = LocaleConverter.class)
     Locale locale;
 }
