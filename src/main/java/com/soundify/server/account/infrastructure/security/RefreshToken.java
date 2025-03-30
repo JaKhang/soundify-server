@@ -7,9 +7,9 @@ import java.time.temporal.ChronoUnit;
 
 @Data
 public class RefreshToken {
-    private Id id;
-    private Id subject;
-    private Id device;
+    private Id jid;
+    private Id sub;
+    private Id dev;
     private int age;
     private ChronoUnit unit;
 }

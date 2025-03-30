@@ -7,9 +7,9 @@ import java.time.temporal.ChronoUnit;
 
 @Data
 public class AccessToken {
-    private Id id;
-    private Id subject;
-    private Id device;
+    private Id jti;
+    private Id sub;
+    private Id rid;
     private int age;
     private ChronoUnit unit;
 }
