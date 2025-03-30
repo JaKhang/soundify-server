@@ -14,7 +14,7 @@ import java.util.Objects;
 @Embeddable
 public class Image {
     String url;
-    String height;
+    int height;
     int width;
 
     @Override

@@ -6,10 +6,13 @@ import com.soundify.server.shared.domain.AggregateRoot;
 import com.soundify.server.shared.domain.Id;
 import com.soundify.server.shared.exceptions.AuthenticationException;
 import com.soundify.server.shared.exceptions.ErrorCode;
+import com.soundify.server.shared.exceptions.ResourceNotFoundException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.collections4.set.UnmodifiableSet;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
@@ -20,6 +23,7 @@ import java.util.*;
 @Entity
 @Table(name = "accounts")
 @NoArgsConstructor
+@Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Account extends AggregateRoot {
 
@@ -66,10 +70,38 @@ public class Account extends AggregateRoot {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Device> devices = new HashSet<>();
 
+    public Account(Id id, String username, String email, String password, String displayName, List<Image> avatar, LocalDate dateOfBirth, Gender gender, Locale locale, Provider provider, LocalDateTime verifiedAt, Set<Role> roles, AccountStatus status) {
+        super(id);
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.displayName = displayName;
+        this.avatar = avatar;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.locale = locale;
+        this.provider = provider;
+        this.verifiedAt = verifiedAt;
+        this.roles = roles;
+        this.status = status;
+    }
+
     @Enumerated(EnumType.STRING)
     private AccountStatus status;
 
     public Device registerDevice(String os, String ip, String platform) {
+        // Verify input
+        if (os == null || os.isBlank()) {
+            throw new IllegalArgumentException("OS cannot be null or empty.");
+        }
+        if (ip == null || ip.isBlank()) {
+            throw new IllegalArgumentException("IP address cannot be null or empty.");
+        }
+        if (platform == null || platform.isBlank()) {
+            throw new IllegalArgumentException("Platform cannot be null or empty.");
+        }
+
+        // Create and register device
         Device device = new Device(Id.fast(), os, ip, platform, LocalDateTime.now(), this);
         this.devices.add(device);
         registerEvents(new DeviceRegisteredEvent(this.getId().toString(), os, ip, platform, device.getLoginAt()));
@@ -80,7 +112,7 @@ public class Account extends AggregateRoot {
         Device deviceToRemove = this.devices.stream()
                 .filter(device -> device.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Device not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Not found device"));
 
         this.devices.remove(deviceToRemove);
         registerEvents(new DeviceUnregisteredEvent(this.getId().toString(), id));
@@ -174,5 +206,9 @@ public class Account extends AggregateRoot {
     public void changeAvatar(List<Image> avatar) {
         this.avatar = avatar;
         registerEvents(new AvatarChangedEvents(this.getId(), avatar));
+    }
+
+    public Set<Device> getDevices() {
+        return UnmodifiableSet.unmodifiableSet(devices);
     }
 }
