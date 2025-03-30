@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleSystemException(SystemException ex) {
         log.error("Handling SystemException: {}", ex.getErrorCode());
         ErrorCode errorCode = ex.getErrorCode();
-        ErrorResponse response = new ErrorResponse(errorCode.getCode(), HttpStatus.valueOf(errorCode.getCode()).value(), errorCode.getMessage(), null);
+        ErrorResponse response = new ErrorResponse(errorCode.getCode(), errorCode.getStatus().value(), errorCode.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getCode()));
     }
 
