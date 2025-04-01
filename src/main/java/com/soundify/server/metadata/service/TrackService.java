@@ -8,8 +8,12 @@ import java.util.List;
 
 public interface TrackService {
     TrackResponse getById(Id id);
+
     List<TrackResponse> getByIds(List<Id> ids);
-    String create(TrackRequest trackRequest);
-    void update(TrackRequest trackRequest);
-    void delete(String id);
+
+    Id create(TrackRequest trackRequest);
+
+    void update(Id id, TrackRequest trackRequest);
+
+    void delete(Id id);
 }

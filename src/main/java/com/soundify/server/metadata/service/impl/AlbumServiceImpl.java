@@ -32,4 +32,19 @@ public class AlbumServiceImpl implements AlbumService {
         return albumMapper.toAlbumResponses(albumRepository
                 .findAllById(cids));
     }
+
+    @Override
+    public Id create(AlbumResponse albumResponse) {
+        return null;
+    }
+
+    @Override
+    public void update(Id id, AlbumResponse albumResponse) {
+
+    }
+
+    @Override
+    public void delete(Id id) {
+        
+    }
 }

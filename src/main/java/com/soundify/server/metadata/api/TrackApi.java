@@ -1,6 +1,5 @@
 package com.soundify.server.metadata.api;
 
-import com.soundify.server.metadata.dto.ApiResponse;
 import com.soundify.server.metadata.dto.track.TrackRequest;
 import com.soundify.server.metadata.dto.track.TrackResponse;
 import com.soundify.server.metadata.service.TrackService;
@@ -25,39 +24,40 @@ public class TrackApi {
 
     @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<ApiResponse<TrackResponse>> getTrackById(@PathVariable Id id) {
-        return ResponseEntity.ok(new ApiResponse<>(200, "Success", trackService.getById(id)));
+    public ResponseEntity<TrackResponse> getTrackById(@PathVariable Id id) {
+        return ResponseEntity.ok(trackService.getById(id));
     }
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<ApiResponse<List<TrackResponse>>> getTrackByIds(@RequestParam List<Id> ids) {
-        return ResponseEntity.ok(new ApiResponse<>(200, "Success", trackService.getByIds(ids)));
+    public ResponseEntity<List<TrackResponse>> getTrackByIds(@RequestParam List<Id> ids) {
+        return ResponseEntity.ok(trackService.getByIds(ids));
     }
 
-    @PostMapping("/")
+    @PostMapping
     @ResponseBody
-    public ResponseEntity<ApiResponse<Void>> createTrack(@RequestBody @Valid TrackRequest trackRequest, UriComponentsBuilder uriBuilder) {
-        String id = trackService.create(trackRequest);
+    public ResponseEntity<Void> createTrack(@RequestBody @Valid TrackRequest trackRequest, UriComponentsBuilder uriBuilder) {
+        // TODO: Change to 501 NOT IMPLEMENTED (create exception in base branch)
+        Id id = trackService.create(trackRequest);
         // Create URI and attach to header
         URI uri = uriBuilder
                 .path("/api/v1/tracks/{id}")
-                .buildAndExpand(id)
+                .buildAndExpand(id.toString())
                 .toUri();
-        return ResponseEntity.created(uri).body(new ApiResponse<>(201, "Created Success", null));
+        return ResponseEntity.created(uri).build();
     }
 
-    @PutMapping("/")
+    @PutMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<ApiResponse<Void>> updateTrack(@RequestBody @Valid TrackRequest trackRequest) {
-        trackService.update(trackRequest);
-        return ResponseEntity.ok(new ApiResponse<>(200, "Updated Success", null));
+    public ResponseEntity<Void> updateTrack(@PathVariable Id id, @RequestBody @Valid TrackRequest trackRequest) {
+        trackService.update(id, trackRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<ApiResponse<Void>> deleteTrack(@PathVariable String id) {
+    public ResponseEntity<Void> deleteTrack(@PathVariable Id id) {
         trackService.delete(id);
-        return ResponseEntity.ok(new ApiResponse<>(200, "Deleted Success", null));
+        return ResponseEntity.noContent().build();
     }
 }

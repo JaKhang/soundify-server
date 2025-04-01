@@ -8,8 +8,11 @@ import com.soundify.server.shared.data.Image;
 import com.soundify.server.shared.domain.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
@@ -18,6 +21,9 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PACKAGE)
 @Entity
 @Table(name = "album_metadata")
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 public class Album extends AbstractEntity {
     @Column(nullable = false)
