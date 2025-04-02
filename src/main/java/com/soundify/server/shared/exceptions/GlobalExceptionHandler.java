@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +18,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleSystemException(SystemException ex) {
         log.error("Handling SystemException: {}", ex.getErrorCode());
         ErrorCode errorCode = ex.getErrorCode();
-        ErrorResponse response = new ErrorResponse(errorCode.getCode(), HttpStatus.valueOf(errorCode.getCode()).value(), errorCode.getMessage(), null);
-        return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getCode()));
+        ErrorResponse response = new ErrorResponse(errorCode.getCode(), errorCode.getStatus().value(), errorCode.getMessage(), null);
+        return new ResponseEntity<>(response, errorCode.getStatus());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -35,5 +36,12 @@ public class GlobalExceptionHandler {
         log.error("Unexpected error occurred: ", ex);
         ErrorResponse response = new ErrorResponse(500, HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred", null);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        log.error("Unexpected error occurred: ", ex);
+        ErrorResponse response = new ErrorResponse(ErrorCode.INVALID_REQUEST.getCode(), HttpStatus.BAD_REQUEST.value(), ErrorCode.INVALID_REQUEST.getMessage(), null);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }
