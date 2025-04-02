@@ -23,6 +23,9 @@ public interface ArtistMapper {
     @Mapping(source = "locale", target = "localeTag", qualifiedByName = "artistLocaleToLocalTag")
     List<ArtistResponse> toArtistResponses(List<Artist> artists);
 
+    @Mapping(target = "id", expression = "java(generateId())")
+    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(source = "localeTag", target = "locale", qualifiedByName = "artistLocaleTagToLocale")
     Artist createArtistFromRequest(ArtistRequest artistRequest);
 
     Artist updateArtistFromRequest(Id id, ArtistRequest artistRequest);
@@ -30,5 +33,14 @@ public interface ArtistMapper {
     @Named("artistLocaleToLocalTag")
     default String artistLocaleToLocalTag(Locale locale) {
         return locale != null ? locale.toLanguageTag() : Locale.ROOT.toLanguageTag();
+    }
+
+    @Named("artistLocaleTagToLocale")
+    default Locale artistLocaleTagToLocale(String localeTag) {
+        return localeTag == null ? Locale.ROOT : Locale.forLanguageTag(localeTag);
+    }
+
+    default Id generateId() {
+        return Id.fast();
     }
 }

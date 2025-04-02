@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,6 +55,7 @@ public abstract class TrackMapperDecorator implements TrackMapper {
                 .genres(genres)
                 .deleted(trackRequest.deleted())
                 .createdAt(existingTrack.getCreatedAt())
+                .updateAt(LocalDateTime.now())
                 .build();
     }
 }

@@ -41,4 +41,10 @@ public class ArtistApi {
                 .toUri();
         return ResponseEntity.created(uri).build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateArtist(@PathVariable Id id, @RequestBody @Valid ArtistRequest artistRequest) {
+        artistService.update(id, artistRequest);
+        return ResponseEntity.noContent().build();
+    }
 }

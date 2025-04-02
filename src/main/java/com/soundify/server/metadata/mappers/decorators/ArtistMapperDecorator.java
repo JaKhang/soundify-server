@@ -10,6 +10,8 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
+
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class ArtistMapperDecorator implements ArtistMapper {
     @Autowired
@@ -20,6 +22,17 @@ public abstract class ArtistMapperDecorator implements ArtistMapper {
         Artist searchArtist = artistRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Artist not found"));
 
-        return null;
+        return Artist.builder()
+                .id(searchArtist.getId())
+                .name(artistRequest.name())
+                .images(artistRequest.images())
+                .genres(artistRequest.genres())
+                .popularity(artistRequest.popularity())
+                .followers(artistRequest.followers())
+                .locale(artistLocaleTagToLocale(artistRequest.localeTag()))
+                .deleted(artistRequest.deleted())
+                .createdAt(searchArtist.getCreatedAt())
+                .updateAt(LocalDateTime.now())
+                .build();
     }
 }

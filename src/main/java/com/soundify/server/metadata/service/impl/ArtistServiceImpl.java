@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,13 +36,16 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public Id create(ArtistRequest artistRequest) {
+        // TODO: Thiếu @EnableJpaAuditing, set thủ công tạm thời
         Artist artist = artistMapper.createArtistFromRequest(artistRequest);
         return artistRepository.save(artist).getId();
     }
 
+    @Transactional
     @Override
     public void update(Id id, ArtistRequest artistRequest) {
-
+        Artist artist = artistMapper.updateArtistFromRequest(id, artistRequest);
+        artistRepository.save(artist);
     }
 
     @Override
