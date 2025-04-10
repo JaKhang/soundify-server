@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -24,8 +25,10 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFilter;
 
 import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
@@ -39,12 +42,11 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   @Qualifier("delegatedAuthenticationEntryPoint") AuthenticationEntryPoint authEntryPoint,
+                                                   @Qualifier("delegatedAuthenticationEntryPoint")
+                                                   AuthenticationEntryPoint authEntryPoint,
                                                    JwtPrincipalConvertor jwtPrincipalConvertor,
-                                                   JwtDecoder jwtDecoder
-
-
-    ) throws Exception {
+                                                   JwtDecoder jwtDecoder,
+                                                   BlackListFilter blackListFilter) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
@@ -60,18 +62,18 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/ws/**",
-                                "/ws")
+                                "/ws",
+                                "/oauth2/**",
+                                "/login/oauth2/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
+                .addFilterAfter(blackListFilter, BearerTokenAuthenticationFilter.class)
                 .oauth2ResourceServer(configurer -> configurer.jwt(jwt -> jwt.decoder(jwtDecoder).jwtAuthenticationConverter(jwtPrincipalConvertor)));
         return http.build();
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
+
 
 
 
@@ -111,6 +113,12 @@ public class SecurityConfig {
         JWKSet jwkSet = new JWKSet(rsaKey);
         return new ImmutableJWKSet<>(jwkSet);
     }
+
+    @Bean
+    public BlackListFilter blackListFilter(BackListProvider provider){
+        return new BlackListFilter(provider);
+    }
+
 
 
 }

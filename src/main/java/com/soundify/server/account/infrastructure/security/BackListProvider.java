@@ -9,7 +9,7 @@ public interface BackListProvider {
 
     boolean containsDeviceId(Id id);
 
-    boolean addRefreshTokenId(Id id, int age, ChronoUnit unit);
+    void addRefreshTokenId(Id id, int age, ChronoUnit unit);
 
-    boolean addDeviceId(Id id, int age, ChronoUnit unit);
+    void addDeviceId(Id id, int age, ChronoUnit unit);
 }

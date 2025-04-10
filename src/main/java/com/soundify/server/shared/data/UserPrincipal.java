@@ -1,4 +1,4 @@
-package com.soundify.server.security;
+package com.soundify.server.shared.data;
 
 import com.soundify.server.shared.domain.Id;
 import lombok.AllArgsConstructor;

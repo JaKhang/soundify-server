@@ -1,9 +1,9 @@
 package com.soundify.server.account.infrastructure.security;
 
-import com.soundify.server.security.UserPrincipal;
 import com.soundify.server.shared.domain.Id;
 import com.soundify.server.shared.exceptions.AuthenticationException;
 import com.soundify.server.shared.exceptions.ErrorCode;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;

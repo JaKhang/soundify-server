@@ -1,10 +1,9 @@
 package com.soundify.server.account.domain.models;
 
-import com.soundify.server.account.domain.events.*;
-import com.soundify.server.account.domain.models.*;
 import com.soundify.server.shared.data.Image;
 import com.soundify.server.shared.domain.Id;
 import com.soundify.server.shared.exceptions.AuthenticationException;
+import com.soundify.server.shared.exceptions.DomainException;
 import com.soundify.server.shared.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,10 +11,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class AccountTest {
 
@@ -43,44 +44,75 @@ class AccountTest {
         passwordEncoder = mock(PasswordEncoder.class);
     }
 
-    // -------------------- registerDevice() --------------------
+
+    // -------------------- registerDevice() ------------------
 
     @Test
-    void givenValidData_whenRegisterDevice_thenDeviceAdded() {
-        // When
-        Device device = account.registerDevice("Android", "192.168.1.1", "Mobile");
-
-        // Then
-        assertEquals(1, account.getDevices().size());
-        assertNotNull(device);
-        assertEquals("Android", device.getOs());
-    }
-
-    @Test
-    void givenInvalidData_whenRegisterDevice_thenThrowException() {
-        assertThrows(IllegalArgumentException.class, () -> account.registerDevice("", "192.168.1.1", "Mobile"));
-        assertThrows(IllegalArgumentException.class, () -> account.registerDevice("Android", "", "Mobile"));
-        assertThrows(IllegalArgumentException.class, () -> account.registerDevice("Android", "192.168.1.1", ""));
-    }
-
-    // -------------------- unregisterDevice() --------------------
-
-    @Test
-    void givenExistingDevice_whenUnregisterDevice_thenDeviceRemoved() {
+    void givenValidInput_whenRegisterDevice_thenDeviceIsRegistered() {
         // Given
-        Device device = account.registerDevice("Android", "192.168.1.1", "Mobile");
+        String os = "Android";
+        String ip = "192.168.1.1";
+        String platform = "Mobile";
+        int age = 7;
 
         // When
-        account.unregisterDevice(device.getId());
+        Device device = account.registerDevice(os, ip, platform, age, ChronoUnit.DAYS);
 
         // Then
-        assertTrue(account.getDevices().isEmpty());
+        assertNotNull(device);
+        assertEquals(os, device.getOs());
+        assertEquals(ip, device.getIp());
+        assertEquals(platform, device.getPlatform());
+        assertTrue(device.getExpiredAt().isAfter(LocalDateTime.now()));
+        assertTrue(account.getDevices().contains(device));
     }
 
     @Test
-    void givenNonExistingDevice_whenUnregisterDevice_thenThrowException() {
-        Id invalidDeviceId = Id.fast();
-        assertThrows(ResourceNotFoundException.class, () -> account.unregisterDevice(invalidDeviceId));
+    void givenInvalidInput_whenRegisterDevice_thenThrowException() {
+        // Given
+        String os = null;
+        String ip = "";
+        String platform = "Mobile";
+        int age = 7;
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> account.registerDevice(os, "192.168.1.1", platform, age, ChronoUnit.DAYS));
+        assertThrows(IllegalArgumentException.class, () -> account.registerDevice("Windows", ip, platform, age, ChronoUnit.DAYS));
+        assertThrows(IllegalArgumentException.class, () -> account.registerDevice("Windows", "192.168.1.1", "", age, ChronoUnit.DAYS));
+    }
+
+    @Test
+    void givenDeviceExpired_whenCheckIsValidDevice_thenReturnFalse() {
+        // Given
+        String os = "iOS";
+        String ip = "10.0.0.1";
+        String platform = "Tablet";
+        int age = 0; // Thiết bị đã hết hạn
+
+        Device device = account.registerDevice(os, ip, platform, age, ChronoUnit.DAYS);
+
+        // When
+        boolean isValid = account.isValidDevice(device.getId());
+
+        // Then
+        assertFalse(isValid);
+    }
+
+    @Test
+    void givenValidDevice_whenCheckIsValidDevice_thenReturnTrue() {
+        // Given
+        String os = "Linux";
+        String ip = "127.0.0.1";
+        String platform = "Desktop";
+        int age = 10;
+
+        Device device = account.registerDevice(os, ip, platform, age, ChronoUnit.DAYS);
+
+        // When
+        boolean isValid = account.isValidDevice(device.getId());
+
+        // Then
+        assertTrue(isValid);
     }
 
     // -------------------- changePassword() --------------------
@@ -120,7 +152,7 @@ class AccountTest {
 
     @Test
     void givenValidToken_whenVerifyEmail_thenAccountVerified() {
-        account.addVerificationToken("validToken", 5);
+        account.addVerificationToken("validToken", 5, ChronoUnit.HOURS);
 
         account.verifyEmail("validToken");
 
@@ -129,7 +161,7 @@ class AccountTest {
 
     @Test
     void givenInvalidToken_whenVerifyEmail_thenThrowException() {
-        account.addVerificationToken("validToken", 5);
+        account.addVerificationToken("validToken", 5, ChronoUnit.HOURS);
 
         assertThrows(AuthenticationException.class, () -> account.verifyEmail("wrongToken"));
     }
@@ -138,7 +170,7 @@ class AccountTest {
 
     @Test
     void givenValidToken_whenAuthenticateByToken_thenAuthenticationSuccess() {
-        account.setAuthenticationToken("validAuthToken", 10);
+        account.setAuthenticationToken("validAuthToken", 10, ChronoUnit.HOURS);
         account.AuthenticateByToken("validAuthToken");
 
         assertNull(account.getAuthenticationToken());
@@ -146,7 +178,7 @@ class AccountTest {
 
     @Test
     void givenInvalidToken_whenAuthenticateByToken_thenThrowException() {
-        account.setAuthenticationToken("validAuthToken", 10);
+        account.setAuthenticationToken("validAuthToken", 10, ChronoUnit.HOURS);
 
         assertThrows(AuthenticationException.class, () -> account.AuthenticateByToken("invalidToken"));
     }
@@ -154,48 +186,310 @@ class AccountTest {
     // -------------------- addVerificationToken() --------------------
 
     @Test
-    void givenValidToken_whenAddVerificationToken_thenTokenAdded() {
-        account.addVerificationToken("newToken", 5);
+    void givenValidTokenValue_whenAddVerificationToken_thenTokenIsAdded() {
+        // Given
+        String tokenValue = "valid-token";
+        int age = 7;
 
-        assertEquals(1, account.getVerificationTokens().size());
+        // When
+        account.addVerificationToken(tokenValue, age, ChronoUnit.DAYS);
+
+        // Then
+        assertTrue(account.getVerificationTokens().stream()
+                .anyMatch(token -> token.value().equals(tokenValue) &&
+                        token.expiredAt().isAfter(LocalDateTime.now())));
+    }
+
+    @Test
+    void givenInvalidTokenValue_whenAddVerificationToken_thenThrowException() {
+        // Given
+        String invalidTokenValue = " ";
+        int age = 7;
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class,
+                () -> account.addVerificationToken(invalidTokenValue, age, ChronoUnit.DAYS));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> account.addVerificationToken(null, age, ChronoUnit.DAYS));
+    }
+
+    @Test
+    void givenInvalidAge_whenAddVerificationToken_thenThrowException() {
+        // Given
+        String tokenValue = "valid-token";
+        int invalidAge = -1;
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class,
+                () -> account.addVerificationToken(tokenValue, invalidAge, ChronoUnit.DAYS));
+    }
+
+    @Test
+    void givenInvalidChronoUnit_whenAddVerificationToken_thenThrowException() {
+        // Given
+        String tokenValue = "valid-token";
+        int age = 7;
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class,
+                () -> account.addVerificationToken(tokenValue, age, null));
+    }
+
+    @Test
+    void givenMaxTokensExceeded_whenAddVerificationToken_thenThrowException() {
+        // Given
+        int maxTokens = 50;
+        for (int i = 0; i < maxTokens; i++) {
+            account.addVerificationToken("token-" + i, 7, ChronoUnit.DAYS);
+        }
+
+        // When & Then
+        assertThrows(DomainException.class,
+                () -> account.addVerificationToken("exceed-token", 7, ChronoUnit.DAYS));
     }
 
     // -------------------- addResetPasswordToken() --------------------
 
     @Test
-    void givenValidToken_whenAddResetPasswordToken_thenTokenAdded() {
-        account.addResetPasswordToken("resetToken", 5);
+    void givenValidTokenValue_whenAddResetPasswordToken_thenTokenIsAdded() {
+        // Given
+        String tokenValue = "valid-reset-token";
+        int age = 7;
 
-        assertEquals(1, account.getResetPasswordTokens().size());
+        // When
+        account.addResetPasswordToken(tokenValue, age, ChronoUnit.DAYS);
+
+        // Then
+        assertTrue(account.getResetPasswordTokens().stream()
+                .anyMatch(token -> token.value().equals(tokenValue) &&
+                        token.expiredAt().isAfter(LocalDateTime.now())));
+    }
+
+    @Test
+    void givenInvalidTokenValue_whenAddResetPasswordToken_thenThrowException() {
+        // Given
+        String invalidTokenValue = " ";
+        int age = 7;
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class,
+                () -> account.addResetPasswordToken(invalidTokenValue, age, ChronoUnit.DAYS));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> account.addResetPasswordToken(null, age, ChronoUnit.DAYS));
+    }
+
+    @Test
+    void givenInvalidAge_whenAddResetPasswordToken_thenThrowException() {
+        // Given
+        String tokenValue = "valid-reset-token";
+        int invalidAge = -1;
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class,
+                () -> account.addResetPasswordToken(tokenValue, invalidAge, ChronoUnit.DAYS));
+    }
+
+    @Test
+    void givenInvalidChronoUnit_whenAddResetPasswordToken_thenThrowException() {
+        // Given
+        String tokenValue = "valid-reset-token";
+        int age = 7;
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class,
+                () -> account.addResetPasswordToken(tokenValue, age, null));
+    }
+
+    @Test
+    void givenMaxTokensExceeded_whenAddResetPasswordToken_thenThrowException() {
+        // Given
+        int maxTokens = 50;
+        for (int i = 0; i < maxTokens; i++) {
+            account.addResetPasswordToken("reset-token-" + i, 7, ChronoUnit.DAYS);
+        }
+
+        System.out.println(account.getResetPasswordTokens().size());
+        // When & Then
+        assertThrows(DomainException.class,
+                () -> account.addResetPasswordToken("exceed-reset-token", 7, ChronoUnit.DAYS));
     }
 
     // -------------------- setAuthenticationToken() --------------------
 
-    @Test
-    void givenValidToken_whenSetAuthenticationToken_thenTokenSet() {
-        account.setAuthenticationToken("authToken", 10);
 
+    @Test
+    void givenValidToken_whenSetAuthenticationToken_thenTokenIsSet() {
+        // Given
+        String tokenValue = "valid-auth-token";
+        int age = 7;
+
+        // When
+        account.setAuthenticationToken(tokenValue, age, ChronoUnit.DAYS);
+
+        // Then
         assertNotNull(account.getAuthenticationToken());
+        assertEquals(tokenValue, account.getAuthenticationToken().value());
+        assertTrue(account.getAuthenticationToken().expiredAt().isAfter(LocalDateTime.now()));
+    }
+
+    @Test
+    void givenInvalidTokenValue_whenSetAuthenticationToken_thenThrowException() {
+        // Given
+        String invalidTokenValue = " ";
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class,
+                () -> account.setAuthenticationToken(invalidTokenValue, 7, ChronoUnit.DAYS));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> account.setAuthenticationToken(null, 7, ChronoUnit.DAYS));
+    }
+
+    @Test
+    void givenInvalidAge_whenSetAuthenticationToken_thenThrowException() {
+        // Given
+        String tokenValue = "valid-auth-token";
+        int invalidAge = -1;
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class,
+                () -> account.setAuthenticationToken(tokenValue, invalidAge, ChronoUnit.DAYS));
+    }
+
+    @Test
+    void givenInvalidChronoUnit_whenSetAuthenticationToken_thenThrowException() {
+        // Given
+        String tokenValue = "valid-auth-token";
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class,
+                () -> account.setAuthenticationToken(tokenValue, 7, null));
+    }
+
+    @Test
+    void givenExistingToken_whenSetAuthenticationToken_thenTokenIsOverwritten() {
+        // Given
+        String oldTokenValue = "old-auth-token";
+        String newTokenValue = "new-auth-token";
+        account.setAuthenticationToken(oldTokenValue, 7, ChronoUnit.DAYS);
+
+        // When
+        account.setAuthenticationToken(newTokenValue, 7, ChronoUnit.DAYS);
+
+        // Then
+        assertNotNull(account.getAuthenticationToken());
+        assertEquals(newTokenValue, account.getAuthenticationToken().value());
+        assertTrue(account.getAuthenticationToken().expiredAt().isAfter(LocalDateTime.now()));
     }
 
     // -------------------- changeAvatar() --------------------
 
     @Test
-    void givenNewAvatar_whenChangeAvatar_thenAvatarUpdated() {
-        List<Image> newAvatars = List.of(new Image("avatar1.jpg", 300, 300), new Image("avatar2.jpg", 300, 300));
+    void givenValidAvatarList_whenChangeAvatar_thenAvatarIsUpdated() {
+        // Given
+        List<Image> newAvatars = List.of(
+                new Image("avatar1.jpg", 300, 300),
+                new Image("avatar2.jpg", 300, 300)
+        );
 
+        // When
         account.changeAvatar(newAvatars);
 
+        // Then
+        assertNotNull(account.getAvatar());
+        assertEquals(newAvatars, account.getAvatar());
         assertEquals(2, account.getAvatar().size());
+        assertEquals("avatar1.jpg", account.getAvatar().get(0).getUrl());
+        assertEquals("avatar2.jpg", account.getAvatar().get(1).getUrl());
     }
-
-    // -------------------- getDevices() --------------------
 
     @Test
-    void givenDevices_whenGetDevices_thenUnmodifiableSetReturned() {
-        Device device = account.registerDevice("Android", "192.168.1.1", "Mobile");
+    void givenInvalidAvatarList_whenChangeAvatar_thenThrowException() {
+        // Given
+        List<Image> invalidAvatars = List.of(
+                new Image(" ", 300, 300), // URL rỗng hoặc không hợp lệ
+                new Image(null, 300, 300) // URL null
+        );
 
-        Set<Device> devices = account.getDevices();
-        assertThrows(UnsupportedOperationException.class, () -> devices.add(device)); // Should be unmodifiable
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> account.changeAvatar(invalidAvatars));
     }
+
+
+
+    @Test
+    void givenExistingAvatarList_whenChangeAvatar_thenAvatarIsUpdated() {
+        // Given
+        List<Image> oldAvatars = List.of(
+                new Image("old-avatar1.jpg", 300, 300),
+                new Image("old-avatar2.jpg", 300, 300)
+        );
+        List<Image> newAvatars = List.of(
+                new Image("new-avatar1.jpg", 300, 300),
+                new Image("new-avatar2.jpg", 300, 300)
+        );
+        account.changeAvatar(oldAvatars); // Thiết lập danh sách avatar ban đầu
+
+        // When
+        account.changeAvatar(newAvatars);
+
+        // Then
+        assertNotNull(account.getAvatar());
+        assertEquals(newAvatars, account.getAvatar());
+        assertEquals(2, account.getAvatar().size());
+        assertEquals("new-avatar1.jpg", account.getAvatar().get(0).getUrl());
+        assertEquals("new-avatar2.jpg", account.getAvatar().get(1).getUrl());
+    }
+
+    // -------------------- unregisterDevices() --------------------
+
+    @Test
+    void givenExistingDevice_whenUnregisterDevice_thenDeviceIsRemoved() {
+        // Given
+        // Given
+        String os = "Linux";
+        String ip = "127.0.0.1";
+        String platform = "Desktop";
+        int age = 10;
+
+        Device device = account.registerDevice(os, ip, platform, age, ChronoUnit.DAYS);
+        Id deviceId = device.getId();
+
+        // When
+        account.unregisterDevice(deviceId);
+
+        // Then
+        assertFalse(account.getDevices().contains(deviceId));
+        assertEquals(0, account.getDevices().size());
+    }
+
+    @Test
+    void givenNonExistingDevice_whenUnregisterDevice_thenThrow() {
+        // Given
+        String os = "Linux";
+        String ip = "127.0.0.1";
+        String platform = "Desktop";
+        int age = 10;
+
+        Device device = account.registerDevice(os, ip, platform, age, ChronoUnit.DAYS);
+        Id deviceId = device.getId();
+
+        // When Then
+        assertThrows(ResourceNotFoundException.class, () -> account.unregisterDevice(Id.fast()));
+
+    }
+
+    @Test
+    void givenNullDeviceId_whenUnregisterDevice_thenThrowException() {
+        // Given
+        Id deviceId = null;
+
+        // When & Then
+        assertThrows(DomainException.class, () -> account.unregisterDevice(deviceId));
+    }
+
+
+
 }
