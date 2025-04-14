@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.Locale;
 
 @Data
 public class AccessToken {
@@ -14,6 +15,7 @@ public class AccessToken {
     private Id sub;
     private Id rid;
     private int age;
+    private Locale locale;
     private ChronoUnit unit;
     private Collection<? extends GrantedAuthority> authorities;
 }
