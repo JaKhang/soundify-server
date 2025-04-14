@@ -10,9 +10,10 @@ import java.time.temporal.ChronoUnit;
 @Data
 @Builder
 public class RefreshToken {
-    private Id jid;
+    private Id jti;
     private Id sub;
     private Id dev;
     private int age;
     private ChronoUnit unit;
+
 }
