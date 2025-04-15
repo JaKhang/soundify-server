@@ -72,6 +72,10 @@ dependencyManagement {
     }
 }
 
+bootJar {
+    archiveFileName = 'soundify.jar'
+}
+
 tasks.named('test') {
     outputs.dir snippetsDir
     useJUnitPlatform()
