@@ -10,6 +10,7 @@ import java.time.temporal.ChronoUnit;
 @Data
 @Builder
 public class RefreshToken {
+    public static final String TYPE = "refresh";
     private Id jti;
     private Id sub;
     private Id dev;

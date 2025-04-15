@@ -19,9 +19,9 @@ import java.security.spec.X509EncodedKeySpec;
 
 @Component
 public class KeyPairLoader {
-    @Value("${application.security.jwt.private-key}")
+    @Value("${application.security.jwt.private-key-path}")
     private String jwtPublicKeyPath;
-    @Value("${application.security.jwt.public-key}")
+    @Value("${application.security.jwt.public-key-path}")
     private String jwtPrivateKeyPath;
 
     private KeyPair keyPair;
@@ -30,6 +30,14 @@ public class KeyPairLoader {
         if (keyPair == null)
             keyPair = getKeyPair(jwtPublicKeyPath, jwtPrivateKeyPath);
         return keyPair;
+    }
+
+    public KeyPairLoader(String jwtPublicKeyPath, String jwtPrivateKeyPath) {
+        this.jwtPublicKeyPath = jwtPublicKeyPath;
+        this.jwtPrivateKeyPath = jwtPrivateKeyPath;
+    }
+
+    public KeyPairLoader() {
     }
 
     public RSAPublicKey getJWTPublicKey(){

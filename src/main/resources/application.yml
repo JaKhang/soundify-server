@@ -63,3 +63,15 @@ management:
     health:
         elasticsearch:
             enabled: true
+
+
+application:
+    security:
+        jwt:
+            public-key-path: ${JWT_PUBLIC_KEY_PATH:classpath:key/jwt-public.pem}
+            private-key-path: ${JWT_PRIVATE_KEY_PATH:classpath:key/jwt-private.pem}
+            access-token-age: ${JWT_ACCESS_TOKEN_AGE:10}
+            access-token-age-unit: ${JWT_ACCESS_TOKEN_AGE_UNIT:DAYS}
+            refresh-token-age: ${JWT_REFRESH_TOKEN_AGE:20}
+            refresh-token-age-unit: ${JWT_REFRESH_TOKEN_AGE_UNIT:DAYS}
+

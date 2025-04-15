@@ -3,6 +3,8 @@ package com.soundify.server.account.infrastructure.persistence;
 import com.soundify.server.account.domain.models.Account;
 import com.soundify.server.account.domain.models.AccountDomainRepository;
 import com.soundify.server.shared.domain.Id;
+import com.soundify.server.shared.exceptions.AuthenticationException;
+import com.soundify.server.shared.exceptions.ErrorCode;
 import com.soundify.server.shared.exceptions.ResourceNotFoundException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -32,12 +34,20 @@ public interface AccountJPARepository extends JpaRepository<Account, Id>, Accoun
     }
 
     @Override
+    default Account findAggregateByUsernameOrEmail(String s) {
+        return findByUsernameOrEmail(s).orElseThrow(() -> new AuthenticationException("Invalid username or email", ErrorCode.BAD_CREDENTIALS));
+    }
+
+    @Override
     default Account saveAggregate(Account account) {
         return this.save(account);
     }
 
-    @Query("SELECT a FROM Account a WHERE a.email = :email")
-    Optional<Account> findByEmail(String email);
+    @Query("SELECT a FROM Account a " +
+            "LEFT JOIN FETCH a.roles " +
+            "LEFT JOIN FETCH a.devices " +
+            "WHERE a.username = :usernameOrEmail or a.email = :usernameOrEmail")
+    Optional<Account> findByUsernameOrEmail(String usernameOrEmail);
 
     boolean existsByUsername(String username);
 }

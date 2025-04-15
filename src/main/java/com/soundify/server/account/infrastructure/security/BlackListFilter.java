@@ -1,6 +1,5 @@
 package com.soundify.server.account.infrastructure.security;
 
-import com.soundify.server.shared.data.UserPrincipal;
 import com.soundify.server.shared.exceptions.AuthenticationException;
 import com.soundify.server.shared.exceptions.ErrorCode;
 import jakarta.servlet.FilterChain;
@@ -27,7 +26,7 @@ public class BlackListFilter extends OncePerRequestFilter {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (principal instanceof UserPrincipal userPrincipal) {
-            if (backListProvider.containsRefreshTokenId(userPrincipal.getRefreshTokenId())) {
+            if (backListProvider.containsRefreshTokenId(userPrincipal.refreshTokenId())) {
                 throw new AuthenticationException(ErrorCode.FORBIDDEN);
             }
         }

@@ -8,7 +8,10 @@ public enum JwtClaimKey {
     SUBJECT("sub"),
     REFRESH_TOKEN("rid"),
     AUTHORITIES("authorities"),
-    DEVICE("dev");
+    DEVICE("dev"),
+    LOCALE("locale"),
+    DATE_OF_BIRTH("dob"),
+    TOKEN_TYPE("type");
 
     private final String value;
 

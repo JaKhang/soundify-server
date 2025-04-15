@@ -1,6 +1,5 @@
 package com.soundify.server.account.infrastructure.security;
 
-import com.soundify.server.shared.domain.Id;
 import com.soundify.server.shared.exceptions.AuthenticationException;
 import com.soundify.server.shared.exceptions.ErrorCode;
 
@@ -8,18 +7,17 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
-import java.util.Collection;
 import java.util.Locale;
 
 @Log4j2
 public class JwtPrincipalConvertor implements Converter<Jwt, AbstractAuthenticationToken> {
     private final JwtGrantedAuthoritiesConverter authoritiesConverter;
-
-    public JwtPrincipalConvertor() {
+    private final TokenProvider tokenProvider;
+    public JwtPrincipalConvertor(TokenProvider tokenProvider) {
+        this.tokenProvider = tokenProvider;
         this.authoritiesConverter = new JwtGrantedAuthoritiesConverter();
         authoritiesConverter.setAuthorityPrefix("");
         authoritiesConverter.setAuthoritiesClaimName("authorities");
@@ -27,16 +25,10 @@ public class JwtPrincipalConvertor implements Converter<Jwt, AbstractAuthenticat
 
     @Override
     public AbstractAuthenticationToken convert(Jwt source) {
-        if (!"access".equals(source.getClaimAsString("type")))
-            throw new AuthenticationException(ErrorCode.FORBIDDEN);
-
         try {
-            Id id = Id.from(source.getSubject());
-            Id rid = Id.from(source.getClaimAsString("rid"));
-            Locale locale = Locale.forLanguageTag(source.getClaimAsString("locales"));
-            Collection<? extends GrantedAuthority> authorities = authoritiesConverter.convert(source);
-            UserPrincipal jwtPrincipal = new UserPrincipal(id, rid, authorities, locale);
-            return new UsernamePasswordAuthenticationToken(jwtPrincipal, source, authorities);
+            UserPrincipal principal = tokenProvider.extractPrincipal(source);
+            log.info("Convert jwt to principal {}", principal.id());
+            return new UsernamePasswordAuthenticationToken(principal, source, principal.authorities());
         } catch (RuntimeException e) {
             throw new AuthenticationException(ErrorCode.FORBIDDEN);
         }

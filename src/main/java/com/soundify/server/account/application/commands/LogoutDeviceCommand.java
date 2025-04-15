@@ -1,6 +1,7 @@
 package com.soundify.server.account.application.commands;
 
 import com.soundify.server.shared.domain.Id;
+import com.soundify.server.shared.security.Principal;
 
-public record LogoutDeviceCommand(Id accountId, Id deviceId) {
+public record LogoutDeviceCommand(Principal principal) {
 }
