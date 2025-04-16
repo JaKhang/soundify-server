@@ -39,8 +39,9 @@ services:
         ports:
             - '6379:6379'
         volumes:
-#            - redis-data:/data  # Persistent Redis storage
             - ./container/redis/data:/data
+            - ./container/redis/redis.conf:/usr/local/etc/redis/redis.conf
+        command: bash -c "redis-server --requirepass redis"
     mail-dev:
         container_name: soundify-mail-dev
         image: maildev/maildev
@@ -64,32 +65,32 @@ services:
             - MINIO_ROOT_USER=soundify
             - MINIO_ROOT_PASSWORD=soundify
         command: server --console-address ":9001" /data
-#    backend:
-#        container_name: soundify-app
-#        build:
-#            context: .  # Assuming Dockerfile is in the root directory
-#            dockerfile: Dockerfile
-#        depends_on:
-#            - mysql
-#            - redis
-#            - elasticsearch
-#            - minio
-#        networks:
-#            - soundify-net
-#        environment:
-#            - SPRING_DATASOURCE_URL=jdbc:mysql://soundify-mysql:3306/soundify_database
-#            - SPRING_DATASOURCE_USERNAME=soundify
-#            - SPRING_DATASOURCE_PASSWORD=soundify.com
-#            - SPRING_REDIS_HOST=soundify-redis
-#            - SPRING_REDIS_PORT=6379
-#            - SPRING_ELASTICSEARCH_URIS=http://soundify-elasticsearch:9200
-#            - SPRING_MINIO_ENDPOINT=http://soundify-minio:9000
-#            - SPRING_MINIO_ACCESS_KEY=soundify
-#            - SPRING_MINIO_SECRET_KEY=soundify
-#        ports:
-#            - "8080:8080"
-#        volumes:
-#            - ./logs:/app/logs  # Persist logs outside the container
+    backend:
+        container_name: soundify-app
+        build:
+            context: .  # Assuming Dockerfile is in the root directory
+            dockerfile: Dockerfile
+        depends_on:
+            - mysql
+            - redis
+            - elasticsearch
+            - minio
+        networks:
+            - soundify-net
+        environment:
+            - SPRING_DATASOURCE_URL=jdbc:mysql://soundify-mysql:3306/soundify_database
+            - SPRING_DATASOURCE_USERNAME=soundify
+            - SPRING_DATASOURCE_PASSWORD=soundify.com
+            - SPRING_REDIS_HOST=soundify-redis
+            - SPRING_REDIS_PORT=6379
+            - SPRING_ELASTICSEARCH_URIS=http://soundify-elasticsearch:9200
+            - SPRING_MINIO_ENDPOINT=http://soundify-minio:9000
+            - SPRING_MINIO_ACCESS_KEY=soundify
+            - SPRING_MINIO_SECRET_KEY=soundify
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./logs:/app/logs  # Persist logs outside the container
 
 
 networks:
