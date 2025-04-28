@@ -10,7 +10,7 @@ bin/
 *.iml
 *.ipr
 *.iws
-
+/key
 # Eclipse
 .settings/
 .project
