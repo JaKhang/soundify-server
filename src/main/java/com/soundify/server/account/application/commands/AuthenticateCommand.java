@@ -1,6 +1,8 @@
 package com.soundify.server.account.application.commands;
 
-import com.soundify.server.account.application.dto.TokenResponse;
+import co.elastic.clients.elasticsearch.security.AuthenticateResponse;
+import com.soundify.server.account.application.dto.response.AuthenticationResponse;
+import com.soundify.server.account.application.dto.response.TokenResponse;
 import com.soundify.server.shared.mediator.MediatorRequest;
 
 public record AuthenticateCommand (
@@ -9,5 +11,5 @@ public record AuthenticateCommand (
         String os,
         String ip,
         String platform
-) implements MediatorRequest<TokenResponse>{
+) implements MediatorRequest<AuthenticationResponse>{
 }

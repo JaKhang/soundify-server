@@ -2,6 +2,7 @@ package com.soundify.server.account.infrastructure.security;
 
 import com.soundify.server.shared.domain.Id;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,6 +16,7 @@ import java.util.Locale;
 
 @Data
 @AllArgsConstructor
+@Builder
 public class AccessToken {
     public static final String TYPE = "access";
     private Id jti;

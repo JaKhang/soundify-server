@@ -1,4 +1,4 @@
-package com.soundify.server.account.application.dto;
+package com.soundify.server.account.application.dto.response;
 
 public record TokenResponse(
         String token,

@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.collections4.set.UnmodifiableSet;
 import org.checkerframework.checker.units.qual.A;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
 
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -298,5 +300,9 @@ public class Account extends AggregateRoot {
 
     public Set<Device> getDevices() {
         return UnmodifiableSet.unmodifiableSet(devices);
+    }
+
+    public Collection<? extends GrantedAuthority> authorities() {
+        return roles.stream().map(Role::getGrantedAuthorities).flatMap(Collection::stream).collect(Collectors.toList())  ;
     }
 }

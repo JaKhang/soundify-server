@@ -1,9 +1,8 @@
-package com.soundify.server.account.application.dto;
+package com.soundify.server.account.application.dto.response;
 
 import com.soundify.server.shared.data.Image;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 

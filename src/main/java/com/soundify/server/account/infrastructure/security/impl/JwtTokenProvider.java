@@ -41,6 +41,7 @@ public class JwtTokenProvider implements TokenProvider {
                 .claim(JwtClaimKey.DATE_OF_BIRTH.getValue(), context.getDob().toString())// "rid" (refresh token ID)
                 .issuedAt(Instant.now()) // Thời gian phát hành
                 .expiresAt(Instant.now().plus(context.getAge(), context.getUnit())) // Thời gian hết hạn
+                .claim(JwtClaimKey.TOKEN_TYPE.getValue(), AccessToken.TYPE)
                 .build();
 
         // Mã hóa JWT và trả về
@@ -56,6 +57,7 @@ public class JwtTokenProvider implements TokenProvider {
                 .claim(JwtClaimKey.DEVICE.getValue(), context.getDev().toString())
                 .issuedAt(Instant.now()) // Thời gian phát hành
                 .expiresAt(Instant.now().plus(context.getAge(), context.getUnit())) // Thời gian hết hạn
+                .claim(JwtClaimKey.TOKEN_TYPE.getValue(), RefreshToken.TYPE)
                 .build();
 
         // Mã hóa JWT và trả về
@@ -64,7 +66,7 @@ public class JwtTokenProvider implements TokenProvider {
 
     @Override
     public UserPrincipal extractPrincipal(Jwt jwt) {
-        if (AccessToken.TYPE.equals(jwt.getClaimAsString(JwtClaimKey.TOKEN_TYPE.getValue())))
+        if (!AccessToken.TYPE.equals(jwt.getClaimAsString(JwtClaimKey.TOKEN_TYPE.getValue())))
             throw new AuthenticationException(ErrorCode.FORBIDDEN);
         Id id = Id.from(jwt.getSubject()); // "sub"
         Id refreshTokenId = Id.from(jwt.getClaimAsString(JwtClaimKey.REFRESH_TOKEN.getValue())) ;
