@@ -1,6 +1,5 @@
 package com.soundify.server.metadata.entities;
 
-import com.soundify.server.metadata.converter.LocaleConverter;
 import com.soundify.server.shared.data.Image;
 import com.soundify.server.shared.domain.AbstractEntity;
 import jakarta.persistence.*;
@@ -32,7 +31,6 @@ public class Category extends AbstractEntity {
     String name;
 
     @Column
-    @Convert(converter = LocaleConverter.class)
     Locale locale;
 
     @ManyToMany
