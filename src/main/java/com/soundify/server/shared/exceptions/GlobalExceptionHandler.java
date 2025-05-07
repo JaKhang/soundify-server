@@ -14,19 +14,12 @@ import java.util.Map;
 @ControllerAdvice
 @Log4j2
 public class GlobalExceptionHandler {
-    @ExceptionHandler(SystemException.class)
-    public ResponseEntity<ErrorResponse> handleSystemException(SystemException ex) {
-        log.error("Handling SystemException: {}", ex.getErrorCode());
-        ErrorCode errorCode = ex.getErrorCode();
-        ErrorResponse response = new ErrorResponse(errorCode.getCode(), errorCode.getStatus().value(), errorCode.getMessage(), null);
-        return new ResponseEntity<>(response, errorCode.getStatus());
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-        ErrorResponse response = new ErrorResponse(400, HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+        ErrorResponse response = new ErrorResponse(400, "Validation failed", "Bad Request",errors);
         log.warn("Validation failed: {}", errors);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -34,14 +27,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
         log.error("Unexpected error occurred: ", ex);
-        ErrorResponse response = new ErrorResponse(500, HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred", null);
+        ErrorResponse response = new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR,"An unexpected error occurred", "Internal Server Error",null);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
-        log.error("Unexpected error occurred: ", ex);
-        ErrorResponse response = new ErrorResponse(ErrorCode.INVALID_REQUEST.getCode(), HttpStatus.BAD_REQUEST.value(), ErrorCode.INVALID_REQUEST.getMessage(), null);
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
+        ErrorResponse response = new ErrorResponse(400, ex.getMessage(),"Bad Request", null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<ErrorResponse> handleApplicationException(ApplicationException ex) {
+        ErrorResponse response = new ErrorResponse(ex.getCode(), ex.getMessage(), ex.getType(), null);
+        return new ResponseEntity<>(response, HttpStatus.valueOf(ex.getStatus()));
+    }
+
+
+
+
 }
