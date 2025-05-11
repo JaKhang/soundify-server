@@ -1,6 +1,7 @@
 package com.soundify.server.shared.exceptions;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -38,10 +39,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ApplicationException.class)
-    public ResponseEntity<ErrorResponse> handleApplicationException(ApplicationException ex) {
-        ErrorResponse response = new ErrorResponse(ex.getCode(), ex.getMessage(), ex.getType(), null);
-        return new ResponseEntity<>(response, HttpStatus.valueOf(ex.getStatus()));
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(ResourceNotFoundException ex) {
+        ErrorResponse response = new ErrorResponse(404, ex.getMessage(),"Not Found", null);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
 
