@@ -3,7 +3,7 @@ package com.soundify.server.account.infrastructure.persistence;
 import com.soundify.server.account.domain.models.Account;
 import com.soundify.server.account.domain.models.AccountDomainRepository;
 import com.soundify.server.shared.domain.Id;
-import com.soundify.server.shared.exceptions.AuthenticationException;
+import com.soundify.server.account.application.exceptions.AuthenticationException;
 import com.soundify.server.shared.exceptions.ErrorCode;
 import com.soundify.server.shared.exceptions.ResourceNotFoundException;
 import org.springframework.data.jpa.repository.JpaRepository;

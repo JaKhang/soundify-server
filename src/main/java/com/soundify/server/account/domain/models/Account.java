@@ -1,12 +1,14 @@
 package com.soundify.server.account.domain.models;
 
 import com.soundify.server.account.domain.events.*;
+import com.soundify.server.account.domain.exceptions.TokenInvalidException;
 import com.soundify.server.shared.data.Image;
 import com.soundify.server.shared.domain.AggregateRoot;
 import com.soundify.server.shared.domain.Id;
-import com.soundify.server.shared.exceptions.AuthenticationException;
-import com.soundify.server.shared.exceptions.DomainException;
+import com.soundify.server.account.application.exceptions.AuthenticationException;
+import com.soundify.server.shared.exceptions.IllegalDomainArgumentException;
 import com.soundify.server.shared.exceptions.ErrorCode;
+import com.soundify.server.shared.exceptions.IllegalDomainStateException;
 import com.soundify.server.shared.exceptions.ResourceNotFoundException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -14,7 +16,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.collections4.set.UnmodifiableSet;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
@@ -82,25 +83,22 @@ public class Account extends AggregateRoot {
     public Account(Id id, String username, String email, String password, String displayName, List<Image> avatar, LocalDate dateOfBirth, Gender gender, Locale locale, Provider provider, LocalDateTime verifiedAt, Set<Role> roles, AccountStatus status) {
         super(id);
         
-        // Username validation
         if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException("Username cannot be null or empty");
+            throw new IllegalDomainArgumentException("Username cannot be null or empty");
         }
         if (username.length() < 3 || username.length() > 30) {
-            throw new IllegalArgumentException("Username must be between 3 and 30 characters");
+            throw new IllegalDomainArgumentException("Username must be between 3 and 30 characters");
         }
-        if (!username.matches("^[a-zA-Z0-9_]+$")) {
-            throw new IllegalArgumentException("Username can only contain letters, numbers, and underscores");
-        }
+
         this.username = username;
 
         // Email validation
         if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Email cannot be null or empty");
+            throw new IllegalDomainArgumentException("Email cannot be null or empty");
         }
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         if (!email.matches(emailRegex)) {
-            throw new IllegalArgumentException("Invalid email format");
+            throw new IllegalDomainArgumentException("Invalid email format");
         }
         this.email = email;
         this.password = password;
@@ -121,13 +119,13 @@ public class Account extends AggregateRoot {
     public Device registerDevice(String os, String ip, String platform, int age, ChronoUnit unit) {
         // Verify input
         if (os == null || os.isBlank()) {
-            throw new IllegalArgumentException("OS cannot be null or empty.");
+            throw new IllegalDomainArgumentException("OS cannot be null or empty.");
         }
         if (ip == null || ip.isBlank()) {
-            throw new IllegalArgumentException("IP address cannot be null or empty.");
+            throw new IllegalDomainArgumentException("IP address cannot be null or empty.");
         }
         if (platform == null || platform.isBlank()) {
-            throw new IllegalArgumentException("Platform cannot be null or empty.");
+            throw new IllegalDomainArgumentException("Platform cannot be null or empty.");
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -146,7 +144,7 @@ public class Account extends AggregateRoot {
 
     public void unregisterDevice(Id id) {
         if (id == null)
-            throw new DomainException("Device id must not be null",ErrorCode.INVALID_REQUEST);
+            throw new IllegalDomainArgumentException("Device id must not be null");
         Device deviceToRemove = this.devices.stream()
                 .filter(device -> device.getId().equals(id))
                 .findFirst()
@@ -158,11 +156,11 @@ public class Account extends AggregateRoot {
 
     public void changePassword(String currentPassword, String newPassword, PasswordEncoder passwordEncoder) {
         if (newPassword == null || newPassword.length() < 8) {
-            throw new IllegalArgumentException("New password must be at least 8 characters long.");
+            throw new IllegalDomainArgumentException("New password must be at least 8 characters long.");
         }
 
         if (!passwordEncoder.matches(currentPassword, this.password)) {
-            throw new IllegalArgumentException("Current password is incorrect.");
+            throw new IllegalDomainArgumentException("Current password is incorrect.");
         }
 
         this.password = passwordEncoder.encode(newPassword);
@@ -175,7 +173,7 @@ public class Account extends AggregateRoot {
         // Display name validation and update
         if (newDisplayName != null && !newDisplayName.isBlank()) {
             if (newDisplayName.length() > 50) {
-                throw new IllegalArgumentException("Display name cannot exceed 50 characters");
+                throw new IllegalDomainArgumentException("Display name cannot exceed 50 characters");
             }
             this.displayName = newDisplayName;
             isUpdated = true;
@@ -184,14 +182,14 @@ public class Account extends AggregateRoot {
         // Avatar validation and update
         if (newAvatars != null) {
             if (newAvatars.size() > 5) {
-                throw new IllegalArgumentException("Cannot have more than 5 avatars");
+                throw new IllegalDomainArgumentException("Cannot have more than 5 avatars");
             }
             for (Image avatar : newAvatars) {
                 if (avatar == null) {
-                    throw new IllegalArgumentException("Avatar cannot be null");
+                    throw new IllegalDomainArgumentException("Avatar cannot be null");
                 }
                 if (avatar.getWidth() > 2000 || avatar.getHeight() > 2000) {
-                    throw new IllegalArgumentException("Avatar dimensions cannot exceed 2000x2000 pixels");
+                    throw new IllegalDomainArgumentException("Avatar dimensions cannot exceed 2000x2000 pixels");
                 }
             }
             this.avatar = new ArrayList<>(newAvatars);
@@ -201,10 +199,10 @@ public class Account extends AggregateRoot {
         // Date of birth validation and update
         if (newDateOfBirth != null) {
             if (newDateOfBirth.isAfter(LocalDate.now())) {
-                throw new IllegalArgumentException("Date of birth cannot be in the future");
+                throw new IllegalDomainArgumentException("Date of birth cannot be in the future");
             }
             if (ChronoUnit.YEARS.between(newDateOfBirth, LocalDate.now()) < 13) {
-                throw new IllegalArgumentException("User must be at least 13 years old");
+                throw new IllegalDomainArgumentException("User must be at least 13 years old");
             }
             this.dateOfBirth = newDateOfBirth;
             isUpdated = true;
@@ -246,43 +244,37 @@ public class Account extends AggregateRoot {
                 }
             }
         }
-        throw new AuthenticationException("Invalid verification token.", ErrorCode.TOKEN_INVALID);
+        throw new TokenInvalidException("Invalid verification token.");
     }
-
     public void AuthenticateByToken(String tokenValue) {
         if (authenticationToken != null && authenticationToken.value().equals(tokenValue)) {
             authenticationToken = null;
             return;
         }
-        throw new AuthenticationException(ErrorCode.TOKEN_INVALID);
+        throw new TokenInvalidException("Invalid authentication token");
     }
 
     public void addVerificationToken(String tokenValue, int age, ChronoUnit unit) {
-        Assert.hasText(tokenValue, "token must not be blank");
-        Assert.notNull(unit, "Unit must not be null");
-        if (age < 0) throw new IllegalArgumentException("Token age must greater than 0");
+        if (age < 0) throw new IllegalDomainArgumentException("Token age must greater than 0");
         if (verificationTokens.size() >= MAX_TOKENS_SIZE)
-            throw new DomainException("Verification tokens is overflow", ErrorCode.INVALID_REQUEST);
+            throw new IllegalDomainStateException("Verification tokens is overflow");
         LocalDateTime now = LocalDateTime.now();
         verificationTokens.add(new Token(tokenValue, now, now.plus(age, unit)));
         registerEvents(new VerifyTokenAddedEvent(getId(), email, tokenValue, age));
     }
 
     public void addResetPasswordToken(String tokenValue, int age, ChronoUnit unit) {
-        Assert.hasText(tokenValue, "token must not be blank");
-        Assert.notNull(unit, "Unit must not be null");
-        if (age < 0) throw new IllegalArgumentException("Token age must greater than 0");
+        if (age < 0) throw new IllegalDomainArgumentException("Token age must greater than 0");
         if (resetPasswordTokens.size() >= MAX_TOKENS_SIZE)
-            throw new DomainException("Verification tokens is overflow", ErrorCode.INVALID_REQUEST);
+            throw new IllegalDomainStateException("Verification tokens is overflow");
         LocalDateTime now = LocalDateTime.now();
         resetPasswordTokens.add(new Token(tokenValue, now, now.plus(age, unit)));
         registerEvents(new ResetPasswordTokenAddedEvent(getId(), email, tokenValue, age));
     }
 
     public void setAuthenticationToken(String tokenValue, int age, ChronoUnit unit) {
-        Assert.hasText(tokenValue, "token must not be blank");
-        Assert.notNull(unit, "Unit must not be null");
-        if (age < 0) throw new IllegalArgumentException("Token age must greater than 0");
+
+        if (age < 0) throw new IllegalDomainArgumentException("Token age must greater than 0");
         LocalDateTime now = LocalDateTime.now();
         authenticationToken = new Token(tokenValue, now, now.plus(age, unit));
         registerEvents(new AuthenticationTokenAddedEvent(getId(), email, tokenValue, age));

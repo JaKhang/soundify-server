@@ -1,6 +1,6 @@
 package com.soundify.server.account.infrastructure.security;
 
-import com.soundify.server.shared.exceptions.AuthenticationException;
+import com.soundify.server.account.application.exceptions.AuthenticationException;
 import com.soundify.server.shared.exceptions.ErrorCode;
 
 import lombok.extern.log4j.Log4j2;

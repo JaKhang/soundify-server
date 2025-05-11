@@ -1,6 +1,5 @@
 package com.soundify.server.account.application.commands.handler;
 
-import co.elastic.clients.elasticsearch.security.AuthenticateResponse;
 import com.soundify.server.account.application.commands.AuthenticateCommand;
 import com.soundify.server.account.application.dto.response.AuthenticationResponse;
 import com.soundify.server.account.application.dto.response.TokenResponse;
@@ -12,7 +11,7 @@ import com.soundify.server.account.infrastructure.security.AccessToken;
 import com.soundify.server.account.infrastructure.security.RefreshToken;
 import com.soundify.server.account.infrastructure.security.TokenProvider;
 import com.soundify.server.shared.domain.Id;
-import com.soundify.server.shared.exceptions.AuthenticationException;
+import com.soundify.server.account.application.exceptions.AuthenticationException;
 import com.soundify.server.shared.exceptions.ErrorCode;
 import com.soundify.server.shared.mediator.Handler;
 import com.soundify.server.shared.mediator.RequestHandler;
@@ -73,12 +72,13 @@ public class AuthenticateCommandHandler implements RequestHandler<AuthenticateCo
                 .dob(account.getDateOfBirth())
                 .locale(account.getLocale())
                 .sub(account.getId())
+                .age(accessTokenAge)
                 .unit(accessTokenUnit)
                 .rid(refreshToken.getJti())
                 .authorities(account.authorities())
                 .build();
         Jwt accessTokenJwt = tokenProvider.generate(accessToken);
 
-        return new AuthenticationResponse(new TokenResponse(accessTokenJwt.toString(), AccessToken.TYPE),new TokenResponse(refreshTokenJwt.getTokenValue(), RefreshToken.TYPE), Duration.of(refreshTokenAge, refreshTokenUnit));
+        return new AuthenticationResponse(new TokenResponse(accessTokenJwt.getTokenValue(), AccessToken.TYPE),new TokenResponse(refreshTokenJwt.getTokenValue(), RefreshToken.TYPE), Duration.of(refreshTokenAge, refreshTokenUnit));
     }
 }

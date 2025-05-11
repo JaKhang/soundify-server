@@ -1,27 +1,18 @@
 package com.soundify.server.shared.exceptions;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
 public abstract class ApplicationException extends RuntimeException{
-    public ApplicationException() {
+    private final ErrorCode errorCode;
+
+    protected ApplicationException(ErrorCode errorCode) {
+        this.errorCode = errorCode;
     }
 
-    public ApplicationException(String message) {
+    public ApplicationException(String message, ErrorCode errorCode) {
         super(message);
+        this.errorCode = errorCode;
     }
 
-    public ApplicationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ApplicationException(Throwable cause) {
-        super(cause);
-    }
-
-    public ApplicationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

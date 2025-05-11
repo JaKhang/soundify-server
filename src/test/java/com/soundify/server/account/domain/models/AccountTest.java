@@ -2,7 +2,7 @@ package com.soundify.server.account.domain.models;
 
 import com.soundify.server.shared.data.Image;
 import com.soundify.server.shared.domain.Id;
-import com.soundify.server.shared.exceptions.AuthenticationException;
+import com.soundify.server.account.application.exceptions.AuthenticationException;
 import com.soundify.server.shared.exceptions.DomainException;
 import com.soundify.server.shared.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;

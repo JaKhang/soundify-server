@@ -1,20 +1,9 @@
 package com.soundify.server.account.application.commands.handler;
 
-import com.soundify.server.account.application.commands.AuthenticateCommand;
-import com.soundify.server.account.application.dto.response.TokenResponse;
-import com.soundify.server.account.domain.models.Account;
 import com.soundify.server.account.domain.models.AccountDomainRepository;
-import com.soundify.server.account.domain.models.AccountStatus;
-import com.soundify.server.account.domain.models.Device;
-import com.soundify.server.account.infrastructure.security.RefreshToken;
 import com.soundify.server.account.infrastructure.security.TokenProvider;
-import com.soundify.server.shared.domain.Id;
-import com.soundify.server.shared.exceptions.AuthenticationException;
-import com.soundify.server.shared.exceptions.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,9 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticateCommandHandlerTest {

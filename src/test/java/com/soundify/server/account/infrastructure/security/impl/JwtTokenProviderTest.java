@@ -8,7 +8,7 @@ import com.soundify.server.account.infrastructure.security.KeyPairLoader;
 import com.soundify.server.account.infrastructure.security.RefreshToken;
 import com.soundify.server.account.infrastructure.security.UserPrincipal;
 import com.soundify.server.shared.domain.Id;
-import com.soundify.server.shared.exceptions.AuthenticationException;
+import com.soundify.server.account.application.exceptions.AuthenticationException;
 import com.soundify.server.shared.security.Principal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

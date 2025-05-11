@@ -2,8 +2,6 @@ package com.soundify.server.account.infrastructure.security.impl;
 
 import com.soundify.server.account.infrastructure.security.*;
 import com.soundify.server.shared.domain.Id;
-import com.soundify.server.shared.exceptions.AuthenticationException;
-import com.soundify.server.shared.exceptions.ErrorCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -67,7 +65,7 @@ public class JwtTokenProvider implements TokenProvider {
     @Override
     public UserPrincipal extractPrincipal(Jwt jwt) {
         if (!AccessToken.TYPE.equals(jwt.getClaimAsString(JwtClaimKey.TOKEN_TYPE.getValue())))
-            throw new AuthenticationException(ErrorCode.FORBIDDEN);
+            throw new JwtInvalidException("Invalid token type");
         Id id = Id.from(jwt.getSubject()); // "sub"
         Id refreshTokenId = Id.from(jwt.getClaimAsString(JwtClaimKey.REFRESH_TOKEN.getValue())) ;
         Collection<? extends GrantedAuthority> authorities = authoritiesConverter.convert(jwt);
@@ -79,8 +77,8 @@ public class JwtTokenProvider implements TokenProvider {
 
     @Override
     public RefreshPrincipal extractRefreshPrincipal(Jwt jwt) {
-        if (RefreshToken.TYPE.equals(jwt.getClaimAsString(JwtClaimKey.TOKEN_TYPE.getValue())))
-            throw new AuthenticationException(ErrorCode.FORBIDDEN);
+        if (!RefreshToken.TYPE.equals(jwt.getClaimAsString(JwtClaimKey.TOKEN_TYPE.getValue())))
+            throw new JwtInvalidException("Invalid token type");
         Id id = Id.from(jwt.getId()); // "jti" hoặc một claim khác
         Id accountId = Id.from(jwt.getSubject()); // "sub" hoặc một claim khác
         Id deviceId = Id.from(jwt.getClaimAsString(JwtClaimKey.DEVICE.getValue())); // "dev"
