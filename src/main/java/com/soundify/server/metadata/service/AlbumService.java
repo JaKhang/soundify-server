@@ -1,6 +1,8 @@
 package com.soundify.server.metadata.service;
 
+import com.soundify.server.metadata.dto.album.AlbumRequest;
 import com.soundify.server.metadata.dto.album.AlbumResponse;
+import com.soundify.server.metadata.dto.album.AlbumUpdateRequest;
 import com.soundify.server.shared.domain.Id;
 import jakarta.validation.Valid;
 
@@ -11,9 +13,9 @@ public interface AlbumService {
 
     List<AlbumResponse> getByIds(List<Id> cids);
 
-    Id create(AlbumResponse albumResponse);
+    Id create(AlbumRequest albumRequest);
 
-    void update(Id id, @Valid AlbumResponse albumResponse);
+    void update(Id id, @Valid AlbumUpdateRequest albumUpdateRequest);
 
     void delete(Id id);
 }

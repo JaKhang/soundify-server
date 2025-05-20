@@ -36,7 +36,6 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public Id create(ArtistRequest artistRequest) {
-        // TODO: Thiếu @EnableJpaAuditing, set thủ công tạm thời
         Artist artist = artistMapper.createArtistFromRequest(artistRequest);
         return artistRepository.save(artist).getId();
     }
@@ -50,6 +49,6 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public void delete(Id id) {
-
+        artistRepository.deleteById(id);
     }
 }

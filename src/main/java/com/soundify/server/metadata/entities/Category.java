@@ -25,7 +25,7 @@ import java.util.Set;
 public class Category extends AbstractEntity {
 
     @ElementCollection
-    Set<Image> icon = new HashSet<>();
+    Set<Image> icons = new HashSet<>();
 
     @Column(nullable = false)
     String name;
@@ -35,7 +35,7 @@ public class Category extends AbstractEntity {
 
     @ManyToMany
     @JoinTable(name = "category_album", joinColumns = @JoinColumn(name = "category_id"), inverseJoinColumns = @JoinColumn(name = "album_id"))
-    Set<Album> categories = new HashSet<>();
+    Set<Album> albums = new HashSet<>();
 
     @ColumnDefault("0")
     int orderBy;

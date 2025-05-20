@@ -24,7 +24,6 @@ public interface ArtistMapper {
     List<ArtistResponse> toArtistResponses(List<Artist> artists);
 
     @Mapping(target = "id", expression = "java(generateId())")
-    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(source = "localeTag", target = "locale", qualifiedByName = "artistLocaleTagToLocale")
     Artist createArtistFromRequest(ArtistRequest artistRequest);
 

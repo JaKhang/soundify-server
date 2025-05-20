@@ -1,6 +1,9 @@
 package com.soundify.server.metadata.service.impl;
 
+import com.soundify.server.metadata.dto.album.AlbumRequest;
 import com.soundify.server.metadata.dto.album.AlbumResponse;
+import com.soundify.server.metadata.dto.album.AlbumUpdateRequest;
+import com.soundify.server.metadata.entities.Album;
 import com.soundify.server.metadata.mappers.AlbumMapper;
 import com.soundify.server.metadata.repositories.AlbumRepository;
 import com.soundify.server.metadata.service.AlbumService;
@@ -34,17 +37,19 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public Id create(AlbumResponse albumResponse) {
-        return null;
+    public Id create(AlbumRequest albumRequest) {
+        Album album = albumMapper.createAlbumFromRequest(albumRequest);
+        return albumRepository.save(album).getId();
     }
 
     @Override
-    public void update(Id id, AlbumResponse albumResponse) {
-
+    public void update(Id id, AlbumUpdateRequest albumUpdateRequest) {
+        Album album = albumMapper.updateAlbumFromRequest(id, albumUpdateRequest);
+        albumRepository.save(album);
     }
 
     @Override
     public void delete(Id id) {
-        
+        albumRepository.deleteById(id);
     }
 }

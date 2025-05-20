@@ -47,4 +47,10 @@ public class ArtistApi {
         artistService.update(id, artistRequest);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteArtist(@PathVariable Id id) {
+        artistService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

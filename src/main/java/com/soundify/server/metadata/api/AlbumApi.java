@@ -1,6 +1,8 @@
 package com.soundify.server.metadata.api;
 
+import com.soundify.server.metadata.dto.album.AlbumRequest;
 import com.soundify.server.metadata.dto.album.AlbumResponse;
+import com.soundify.server.metadata.dto.album.AlbumUpdateRequest;
 import com.soundify.server.metadata.service.AlbumService;
 import com.soundify.server.shared.domain.Id;
 import jakarta.validation.Valid;
@@ -32,8 +34,8 @@ public class AlbumApi {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createAlbum(@RequestBody @Valid AlbumResponse albumResponse, UriComponentsBuilder uriBuilder) {
-        Id id = albumService.create(albumResponse);
+    public ResponseEntity<Void> createAlbum(@RequestBody @Valid AlbumRequest albumRequest, UriComponentsBuilder uriBuilder) {
+        Id id = albumService.create(albumRequest);
         URI uri = uriBuilder
                 .path("/api/v1/albums/{id}")
                 .buildAndExpand(id.toString())
@@ -42,8 +44,8 @@ public class AlbumApi {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateAlbum(@PathVariable Id id, @RequestBody @Valid AlbumResponse albumResponse) {
-        albumService.update(id, albumResponse);
+    public ResponseEntity<Void> updateAlbum(@PathVariable Id id, @RequestBody @Valid AlbumUpdateRequest albumUpdateRequest) {
+        albumService.update(id, albumUpdateRequest);
         return ResponseEntity.noContent().build();
     }
 

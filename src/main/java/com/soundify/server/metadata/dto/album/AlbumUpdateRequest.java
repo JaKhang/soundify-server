@@ -10,11 +10,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-public record AlbumUpdateRequest(@NotBlank String name, @NotNull AlbumType type, String label, @Min(0) int popularity,
-                                 @NotEmpty List<Id> artists, String localeTag, Set<String> notAvailableLocaleTags,
-                                 @NotEmpty List<Id> tracks, boolean explicit, @NotEmpty Set<Genre> genres,
-                                 @NotEmpty Set<Image> images, Set<Copyright> copyrights, boolean deleted) {
+// Chỉ gửi List<Id> về
+public record AlbumUpdateRequest(@NotBlank String name, @NotNull AlbumType type, @NotNull LocalDateTime releaseDate,
+                           String label, @Min(0) int popularity, @NotEmpty List<Id> artistIds, String localeTag,
+                           Set<String> notAvailableLocaleTags, @NotEmpty List<Id> trackIds, boolean explicit,
+                           @NotEmpty Set<Genre> genres, @NotEmpty Set<Image> images, Set<Copyright> copyrights, boolean deleted) {
 }

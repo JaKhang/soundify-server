@@ -24,7 +24,6 @@ import java.util.Set;
 @Getter
 public class Artist extends AbstractEntity {
 
-
     String name;
 
     @ElementCollection
