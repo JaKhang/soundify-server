@@ -35,7 +35,7 @@ public class TestConfig {
                                 "/ws")
                         .permitAll()
                         .anyRequest()
-                        .authenticated());
+                        .permitAll());
         return http.build();
     }
 }

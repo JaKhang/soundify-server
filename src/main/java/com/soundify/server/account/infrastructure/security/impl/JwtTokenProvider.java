@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.stream.Collectors;
 @Component
-public class JwtTokenProvider implements TokenProvider {
+public class JwtTokenProvider implements JwtProvider {
 
     private final JwtEncoder jwtEncoder;
     private final JwtGrantedAuthoritiesConverter authoritiesConverter;

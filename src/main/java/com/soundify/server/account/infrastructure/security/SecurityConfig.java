@@ -76,7 +76,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtPrincipalConvertor jwtPrincipalConvertor(TokenProvider tokenProvider) {
+    public JwtPrincipalConvertor jwtPrincipalConvertor(JwtProvider tokenProvider) {
         return new JwtPrincipalConvertor(tokenProvider);
     }
 

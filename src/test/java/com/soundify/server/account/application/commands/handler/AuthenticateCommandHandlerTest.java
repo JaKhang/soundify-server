@@ -1,7 +1,7 @@
 package com.soundify.server.account.application.commands.handler;
 
 import com.soundify.server.account.domain.models.AccountDomainRepository;
-import com.soundify.server.account.infrastructure.security.TokenProvider;
+import com.soundify.server.account.infrastructure.security.JwtProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,7 +28,7 @@ class AuthenticateCommandHandlerTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private TokenProvider tokenProvider;
+    private JwtProvider tokenProvider;
 
     @InjectMocks
     private AuthenticateCommandHandler handler;

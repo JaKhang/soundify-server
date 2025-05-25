@@ -1,12 +1,8 @@
 package com.soundify.server.account.infrastructure.security;
 
-import com.soundify.server.account.application.exceptions.AuthenticationException;
-import com.soundify.server.shared.exceptions.ErrorCode;
-
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -16,8 +12,8 @@ import java.util.Locale;
 @Log4j2
 public class JwtPrincipalConvertor implements Converter<Jwt, AbstractAuthenticationToken> {
     private final JwtGrantedAuthoritiesConverter authoritiesConverter;
-    private final TokenProvider tokenProvider;
-    public JwtPrincipalConvertor(TokenProvider tokenProvider) {
+    private final JwtProvider tokenProvider;
+    public JwtPrincipalConvertor(JwtProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
         this.authoritiesConverter = new JwtGrantedAuthoritiesConverter();
         authoritiesConverter.setAuthorityPrefix("");
