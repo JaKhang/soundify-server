@@ -1,4 +1,4 @@
-package com.soundify.server.account.application.dto.request;
+package com.soundify.server.account.http.request;
 
 import jakarta.validation.constraints.NotBlank;
 

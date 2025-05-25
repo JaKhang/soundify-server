@@ -4,7 +4,7 @@ import com.soundify.server.shared.domain.Id;
 
 import java.time.temporal.ChronoUnit;
 
-public interface BackListProvider {
+public interface BlackListProvider {
     boolean containsRefreshTokenId(Id rid);
 
     boolean containsDeviceId(Id id);

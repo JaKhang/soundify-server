@@ -22,6 +22,7 @@ public class AccessToken {
     private Id jti;
     private Id sub;
     private Id rid;
+    private Id dev;
     private int age;
     private Locale locale;
     private ChronoUnit unit;

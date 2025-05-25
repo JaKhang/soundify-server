@@ -5,8 +5,7 @@ import com.soundify.server.account.domain.models.Account;
 import com.soundify.server.account.domain.models.AccountDomainRepository;
 import com.soundify.server.shared.domain.Id;
 import com.soundify.server.shared.exceptions.BadRequestException;
-import com.soundify.server.shared.exceptions.DomainException;
-import com.soundify.server.shared.exceptions.ErrorCode;
+
 import com.soundify.server.shared.mediator.Handler;
 import com.soundify.server.shared.mediator.RequestHandler;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class CreateUserCommandHandler implements RequestHandler<CreateUserComman
         String encodedPassword = passwordEncoder.encode(command.password());
         Account account = new Account(
                 Id.fast(),
-                command.email().split("@")[0],
+                Id.fast().toString(),
                 command.email(),
                 encodedPassword,
                 command.displayName(),

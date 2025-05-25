@@ -1,30 +1,28 @@
 package com.soundify.server.account.http;
 
-import com.soundify.server.account.application.commands.AuthenticateCommand;
-import com.soundify.server.account.application.commands.CreateUserCommand;
-import com.soundify.server.account.application.commands.ReAuthenticateCommand;
-import com.soundify.server.account.application.dto.request.LocalAuthenticateRequest;
-import com.soundify.server.account.application.dto.request.ReauthenticateRequest;
-import com.soundify.server.account.application.dto.response.AuthenticationResponse;
-import com.soundify.server.account.application.dto.response.TokenResponse;
+import com.soundify.server.account.application.commands.*;
+import com.soundify.server.account.http.request.LocalAuthenticateRequest;
+import com.soundify.server.account.application.dto.AuthenticationResponse;
+import com.soundify.server.account.application.dto.TokenResponse;
 import com.soundify.server.account.domain.models.AccountStatus;
 import com.soundify.server.account.domain.models.Provider;
 import com.soundify.server.account.domain.models.Role;
 import com.soundify.server.account.http.request.RegisterRequest;
+import com.soundify.server.account.http.request.VerifyRequest;
 import com.soundify.server.shared.domain.Id;
 import com.soundify.server.shared.exceptions.BadRequestException;
 import com.soundify.server.shared.mediator.Mediator;
+import com.soundify.server.shared.security.Principal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ua_parser.Client;
 import ua_parser.Parser;
@@ -116,5 +114,30 @@ public class AuthApi {
                 AccountStatus.ACTIVE  // Status is optional
         ));
     }
+
+    @PostMapping("/verify")
+    public void verify(@RequestBody VerifyRequest verifyRequest){
+        gateway.send(new VerifyCommand(verifyRequest.token(), verifyRequest.email()));
+    }
+
+    @PutMapping("/verify")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void requestVerify(@RequestParam String email){
+        gateway.send(new RequestVerifyCodeCommand(email));
+    }
+
+    @PutMapping("/reset-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void requestResetPassword(@RequestParam String email){
+        gateway.send(new RequestVerifyCodeCommand(email));
+    }
+
+
+    @PostMapping("/reset-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resetPassword(@RequestParam String email){
+        gateway.send(new RequestVerifyCodeCommand(email));
+    }
+
 
 }

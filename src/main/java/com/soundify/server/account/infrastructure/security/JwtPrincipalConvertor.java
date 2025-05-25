@@ -6,6 +6,7 @@ import com.soundify.server.shared.exceptions.ErrorCode;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -30,7 +31,7 @@ public class JwtPrincipalConvertor implements Converter<Jwt, AbstractAuthenticat
             log.info("Convert jwt to principal {}", principal.id());
             return new UsernamePasswordAuthenticationToken(principal, source, principal.authorities());
         } catch (RuntimeException e) {
-            throw new AuthenticationException(ErrorCode.FORBIDDEN);
+            throw new IllegalJwtException("Invalid jwt token");
         }
     }
 

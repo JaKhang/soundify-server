@@ -1,8 +1,8 @@
 package com.soundify.server.account.application.commands.handler;
 
 import com.soundify.server.account.application.commands.AuthenticateCommand;
-import com.soundify.server.account.application.dto.response.AuthenticationResponse;
-import com.soundify.server.account.application.dto.response.TokenResponse;
+import com.soundify.server.account.application.dto.AuthenticationResponse;
+import com.soundify.server.account.application.dto.TokenResponse;
 import com.soundify.server.account.domain.models.Account;
 import com.soundify.server.account.domain.models.AccountDomainRepository;
 import com.soundify.server.account.domain.models.AccountStatus;
@@ -11,14 +11,14 @@ import com.soundify.server.account.infrastructure.security.AccessToken;
 import com.soundify.server.account.infrastructure.security.RefreshToken;
 import com.soundify.server.account.infrastructure.security.TokenProvider;
 import com.soundify.server.shared.domain.Id;
-import com.soundify.server.account.application.exceptions.AuthenticationException;
-import com.soundify.server.shared.exceptions.ErrorCode;
 import com.soundify.server.shared.mediator.Handler;
 import com.soundify.server.shared.mediator.RequestHandler;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -50,10 +50,10 @@ public class AuthenticateCommandHandler implements RequestHandler<AuthenticateCo
         log.info("Authenticate with credentials {}" ,request.usernameOrEmail());
         Account account = accountRepository.findAggregateByUsernameOrEmail(request.usernameOrEmail());
         if (account.getStatus() != AccountStatus.ACTIVE)
-            throw new AuthenticationException(ErrorCode.ACCOUNT_NOT_ACTIVE);
+            throw new DisabledException("Account is disabled");
 
         if (!passwordEncoder.matches(request.password(), account.getPassword()))
-            throw new AuthenticationException(ErrorCode.BAD_CREDENTIALS);
+            throw new BadCredentialsException("Invalid password");
 
         Device device = account.registerDevice(request.os(), request.ip(), request.platform(), refreshTokenAge, refreshTokenUnit);
         accountRepository.saveAggregate(account);
@@ -73,6 +73,7 @@ public class AuthenticateCommandHandler implements RequestHandler<AuthenticateCo
                 .locale(account.getLocale())
                 .sub(account.getId())
                 .age(accessTokenAge)
+                .dev(device.getId())
                 .unit(accessTokenUnit)
                 .rid(refreshToken.getJti())
                 .authorities(account.authorities())

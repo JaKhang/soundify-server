@@ -40,6 +40,7 @@ public class JwtTokenProvider implements TokenProvider {
                 .issuedAt(Instant.now()) // Thời gian phát hành
                 .expiresAt(Instant.now().plus(context.getAge(), context.getUnit())) // Thời gian hết hạn
                 .claim(JwtClaimKey.TOKEN_TYPE.getValue(), AccessToken.TYPE)
+                .claim(JwtClaimKey.DEVICE.getValue(), context.getDev().toString())
                 .build();
 
         // Mã hóa JWT và trả về
@@ -65,20 +66,20 @@ public class JwtTokenProvider implements TokenProvider {
     @Override
     public UserPrincipal extractPrincipal(Jwt jwt) {
         if (!AccessToken.TYPE.equals(jwt.getClaimAsString(JwtClaimKey.TOKEN_TYPE.getValue())))
-            throw new JwtInvalidException("Invalid token type");
+            throw new IllegalJwtException("Invalid jwt type");
         Id id = Id.from(jwt.getSubject()); // "sub"
         Id refreshTokenId = Id.from(jwt.getClaimAsString(JwtClaimKey.REFRESH_TOKEN.getValue())) ;
         Collection<? extends GrantedAuthority> authorities = authoritiesConverter.convert(jwt);
         Locale locale = Locale.forLanguageTag(jwt.getClaimAsString(JwtClaimKey.LOCALE.getValue()));
         LocalDate dateOfBirth = LocalDate.parse(jwt.getClaim(JwtClaimKey.DATE_OF_BIRTH.getValue()));
-
-        return new UserPrincipal(id, refreshTokenId, authorities, locale, dateOfBirth);
+        Id deviceId = Id.from(jwt.getClaimAsString(JwtClaimKey.DEVICE.getValue()));
+        return new UserPrincipal(id, refreshTokenId, authorities, locale, dateOfBirth, deviceId);
     }
 
     @Override
     public RefreshPrincipal extractRefreshPrincipal(Jwt jwt) {
         if (!RefreshToken.TYPE.equals(jwt.getClaimAsString(JwtClaimKey.TOKEN_TYPE.getValue())))
-            throw new JwtInvalidException("Invalid token type");
+            throw new IllegalJwtException("Invalid jwt type");
         Id id = Id.from(jwt.getId()); // "jti" hoặc một claim khác
         Id accountId = Id.from(jwt.getSubject()); // "sub" hoặc một claim khác
         Id deviceId = Id.from(jwt.getClaimAsString(JwtClaimKey.DEVICE.getValue())); // "dev"

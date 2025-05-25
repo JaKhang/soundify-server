@@ -1,7 +1,5 @@
 package com.soundify.server.account.infrastructure.security;
 
-import com.soundify.server.account.application.exceptions.AuthenticationException;
-import com.soundify.server.shared.exceptions.ErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +15,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class BlackListFilter extends OncePerRequestFilter {
 
-    private final BackListProvider backListProvider;
+    private final BlackListProvider blackListProvider;
 
 
     @Override
@@ -30,7 +28,11 @@ public class BlackListFilter extends OncePerRequestFilter {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal != null) {
             if (principal instanceof UserPrincipal userPrincipal) {
-                if (backListProvider.containsRefreshTokenId(userPrincipal.refreshTokenId())) {
+                if (blackListProvider.containsRefreshTokenId(userPrincipal.refreshTokenId())) {
+                    throw new AuthorizationDeniedException("Access denied");
+                }
+
+                if (blackListProvider.containsDeviceId(userPrincipal.deviceId())) {
                     throw new AuthorizationDeniedException("Access denied");
                 }
             }

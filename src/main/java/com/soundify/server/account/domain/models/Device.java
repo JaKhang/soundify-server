@@ -39,6 +39,8 @@ public class Device extends AbstractEntity {
         this.account = account;
     }
 
+
+
     private void validateConstructorParameters(String os, String ip, String platform, 
                                             LocalDateTime loginAt, LocalDateTime expiredAt, 
                                             Account account) {
@@ -110,5 +112,8 @@ public class Device extends AbstractEntity {
                Objects.equals(account.getId(), device.account.getId());
     }
 
-
+    @Override
+    public String toString() {
+        return id.toString();
+    }
 }

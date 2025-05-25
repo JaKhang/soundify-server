@@ -2,10 +2,8 @@ package com.soundify.server.account.application.commands;
 
 import com.soundify.server.shared.mediator.MediatorNotification;
 
-public record ResetPasswordRequestCommand(
-        String email,
+public record VerifyCommand(
         String token,
-        String newPassword
-
+        String email
 ) implements MediatorNotification {
 }

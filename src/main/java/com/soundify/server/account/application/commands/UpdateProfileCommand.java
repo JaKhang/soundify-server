@@ -1,4 +1,10 @@
 package com.soundify.server.account.application.commands;
 
-public record UpdateProfileCommand() {
+import java.time.LocalDate;
+
+public record UpdateProfileCommand(
+        String displayName,
+        LocalDate dateOfBirth,
+        String gender
+) {
 }

@@ -1,6 +1,6 @@
 package com.soundify.server.account.application.commands;
 
-import com.soundify.server.account.application.dto.response.TokenResponse;
+import com.soundify.server.account.application.dto.TokenResponse;
 import com.soundify.server.shared.mediator.MediatorRequest;
 
 public record ReAuthenticateCommand(

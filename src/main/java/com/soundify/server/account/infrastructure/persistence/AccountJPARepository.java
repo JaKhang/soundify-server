@@ -8,6 +8,7 @@ import com.soundify.server.shared.exceptions.ErrorCode;
 import com.soundify.server.shared.exceptions.ResourceNotFoundException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 
@@ -35,7 +36,7 @@ public interface AccountJPARepository extends JpaRepository<Account, Id>, Accoun
 
     @Override
     default Account findAggregateByUsernameOrEmail(String s) {
-        return findByUsernameOrEmail(s).orElseThrow(() -> new AuthenticationException("Invalid username or email", ErrorCode.BAD_CREDENTIALS));
+        return findByUsernameOrEmail(s).orElseThrow(() -> new UsernameNotFoundException("Not fount account with username or email:" + s));
     }
 
     @Override
