@@ -9,7 +9,7 @@ import com.soundify.server.account.domain.models.AccountStatus;
 import com.soundify.server.account.domain.models.Device;
 import com.soundify.server.account.infrastructure.security.AccessToken;
 import com.soundify.server.account.infrastructure.security.RefreshToken;
-import com.soundify.server.account.infrastructure.security.TokenProvider;
+import com.soundify.server.account.infrastructure.security.JwtProvider;
 import com.soundify.server.shared.domain.Id;
 import com.soundify.server.shared.mediator.Handler;
 import com.soundify.server.shared.mediator.RequestHandler;
@@ -31,7 +31,7 @@ import java.time.temporal.ChronoUnit;
 public class AuthenticateCommandHandler implements RequestHandler<AuthenticateCommand, AuthenticationResponse> {
     private final AccountDomainRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TokenProvider tokenProvider;
+    private final JwtProvider tokenProvider;
 
 
     @Value("${application.security.jwt.refresh-token-age}")

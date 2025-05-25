@@ -4,7 +4,9 @@ import com.soundify.server.account.application.commands.LogoutCommand;
 import com.soundify.server.account.application.commands.LogoutDeviceCommand;
 import com.soundify.server.account.application.commands.RequestVerifyCodeCommand;
 import com.soundify.server.account.application.dto.DeviceResponse;
+import com.soundify.server.account.application.dto.PrincipalResponse;
 import com.soundify.server.account.application.queries.GetDeviceQuery;
+import com.soundify.server.account.application.queries.GetPrincipalQuery;
 import com.soundify.server.account.http.request.VerifyRequest;
 import com.soundify.server.account.infrastructure.security.UserPrincipal;
 import com.soundify.server.shared.domain.Id;
@@ -32,8 +34,8 @@ public class AccountApi {
     }
 
     @GetMapping("/principal")
-    public Principal test2(@AuthenticationPrincipal Principal principal) {
-        return principal;
+    public PrincipalResponse getPrincipal(@AuthenticationPrincipal Principal principal) {
+        return gateway.send(new GetPrincipalQuery(principal.id()));
     }
 
     @GetMapping("/admin")

@@ -24,7 +24,7 @@ import java.time.temporal.ChronoUnit;
 @Log4j2
 public class ReauthenticateCommandHandler implements RequestHandler<ReAuthenticateCommand, TokenResponse> {
     private final AccountDomainRepository accountRepository;
-    private final TokenProvider tokenProvider;
+    private final JwtProvider tokenProvider;
     private final BlackListProvider blackListProvider;
     private final JwtDecoder jwtDecoder;
     @Value("${application.security.jwt.access-token-age}")

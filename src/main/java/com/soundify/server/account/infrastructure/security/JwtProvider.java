@@ -2,7 +2,7 @@ package com.soundify.server.account.infrastructure.security;
 
 import org.springframework.security.oauth2.jwt.Jwt;
 
-public interface TokenProvider {
+public interface JwtProvider {
 
     Jwt generate(AccessToken context);
 
