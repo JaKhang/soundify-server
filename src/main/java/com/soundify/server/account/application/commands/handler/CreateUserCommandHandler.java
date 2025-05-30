@@ -1,6 +1,7 @@
 package com.soundify.server.account.application.commands.handler;
 
 import com.soundify.server.account.application.commands.CreateUserCommand;
+import com.soundify.server.account.application.exceptions.EmailAlreadyExistsException;
 import com.soundify.server.account.domain.models.Account;
 import com.soundify.server.account.domain.models.AccountDomainRepository;
 import com.soundify.server.shared.domain.Id;
