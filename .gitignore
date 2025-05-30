@@ -5,12 +5,14 @@ out/
 bin/
 !gradle-wrapper.jar
 
+/key
+
 # IntelliJ IDEA
 .idea/
 *.iml
 *.ipr
 *.iws
-
+/key
 # Eclipse
 .settings/
 .project

@@ -1,0 +1,20 @@
+package com.soundify.server.account.infrastructure.security;
+
+import com.soundify.server.shared.domain.Id;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.time.temporal.ChronoUnit;
+
+@Data
+@Builder
+public class RefreshToken {
+    public static final String TYPE = "refresh";
+    private Id jti;
+    private Id sub;
+    private Id dev;
+    private int age;
+    private ChronoUnit unit;
+
+}

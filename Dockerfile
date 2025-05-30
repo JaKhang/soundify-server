@@ -1,14 +1,13 @@
-# Use OpenJDK as base image
-FROM openjdk:17-jdk-slim
+# Use a base image that contains JDK 21
+FROM openjdk:21
 
-# Set working directory
+# Set the working directory inside the container
 WORKDIR /app
-
-# Copy JAR file (Make sure your JAR is built)
-COPY build/libs/soundify.jar app.jar
-
-# Expose the application port
+VOLUME /app
+# Copy the jar file into the container
+COPY build/libs/soundify.jar soundify.jar
+# Expose the port your application runs on
 EXPOSE 8080
 
-# Run the Spring Boot app
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Command to run the jar file
+ENTRYPOINT ["java", "-jar", "soundify.jar"]
