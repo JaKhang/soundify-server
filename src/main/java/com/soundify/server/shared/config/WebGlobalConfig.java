@@ -3,6 +3,7 @@ package com.soundify.server.shared.config;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.soundify.server.shared.domain.Id;
 import jakarta.servlet.MultipartConfigElement;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
@@ -12,6 +13,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.util.unit.DataSize;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ua_parser.Parser;
 
@@ -59,5 +61,16 @@ public class WebGlobalConfig implements WebMvcConfigurer {
         return protocolHandler -> {
             protocolHandler.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
         };
+    }
+
+
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOriginPatterns("*")
+                .allowedMethods("*") // Cho phép tất cả các phương thức HTTP (GET, POST, PUT, DELETE, v.v.)
+                .allowedHeaders("*") // Cho phép tất cả các header
+                .allowCredentials(true); // Cho phép gửi thông tin xác thực (cookies, headers)
     }
 }

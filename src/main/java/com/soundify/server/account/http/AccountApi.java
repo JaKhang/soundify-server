@@ -2,23 +2,25 @@ package com.soundify.server.account.http;
 
 import com.soundify.server.account.application.commands.LogoutCommand;
 import com.soundify.server.account.application.commands.LogoutDeviceCommand;
-import com.soundify.server.account.application.commands.RequestVerifyCodeCommand;
 import com.soundify.server.account.application.dto.DeviceResponse;
 import com.soundify.server.account.application.dto.PrincipalResponse;
 import com.soundify.server.account.application.queries.GetDeviceQuery;
 import com.soundify.server.account.application.queries.GetPrincipalQuery;
-import com.soundify.server.account.http.request.VerifyRequest;
 import com.soundify.server.account.infrastructure.security.UserPrincipal;
 import com.soundify.server.shared.domain.Id;
 import com.soundify.server.shared.mediator.Mediator;
 import com.soundify.server.shared.security.Principal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.Set;
 
 @RestController
@@ -51,14 +53,25 @@ public class AccountApi {
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(@AuthenticationPrincipal UserPrincipal principal){
+    public ResponseEntity<?> logout(@AuthenticationPrincipal UserPrincipal principal) {
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                .path("/")
+                .maxAge(Duration.ZERO)
+
+                .build();
+
         gateway.send(new LogoutCommand(principal));
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
     }
 
     @PostMapping("/devices/{deviceId}/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logoutDevice(@PathVariable Id deviceId, @AuthenticationPrincipal UserPrincipal principal){
         gateway.send(new LogoutDeviceCommand(principal, deviceId));
+
     }
 
 

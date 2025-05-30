@@ -18,6 +18,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.server.Cookie;
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -69,8 +71,8 @@ public class AuthApi {
                 .httpOnly(true)
                 .secure(!profile.equals(DEV_PROFILE))
                 .path("/")
+                .sameSite(Cookie.SameSite.LAX.attributeValue()) // Quan trọng nếu frontend và backend ở domain khác nhau
                 .maxAge(response.age())
-                .sameSite("Strict")
                 .build();
 
         return ResponseEntity.ok()

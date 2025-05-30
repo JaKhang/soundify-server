@@ -129,6 +129,11 @@ public class Account extends AggregateRoot {
             throw new IllegalArgumentException("Platform cannot be null or empty.");
         }
 
+        if(devices.size() == MAX_DEVICE){
+            Device device = getOldDevice();
+            unregisterDevice(device.getId());
+        }
+
         LocalDateTime now = LocalDateTime.now();
         // Create and register device
         Device device = new Device(Id.fast(), os, ip, platform, now, now.plus(age, unit) , this);
@@ -154,7 +159,7 @@ public class Account extends AggregateRoot {
                 .orElseThrow(() -> new ResourceNotFoundException("Not found device"));
 
         this.devices.remove(deviceToRemove);
-        registerEvents(new DeviceUnregisteredEvent(this.getId().toString(), id));
+        registerEvents(new DeviceUnregisteredEvent(this.getId(), id));
     }
 
     public void changePassword(String currentPassword, String newPassword, PasswordEncoder passwordEncoder) {
@@ -337,4 +342,11 @@ public class Account extends AggregateRoot {
             registerEvents(new AccountLockedEvent(this.getId()));
         }
     }
+
+     private Device getOldDevice() {
+        return devices.stream()
+                .min(Comparator.comparing(Device::getLoginAt))
+                .orElseThrow(() -> new ResourceNotFoundException("No devices found for this account"));
+    }
+
 }

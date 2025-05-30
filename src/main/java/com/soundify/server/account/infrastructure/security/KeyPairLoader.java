@@ -19,16 +19,25 @@ import java.security.spec.X509EncodedKeySpec;
 
 @Component
 public class KeyPairLoader {
-    @Value("${application.security.jwt.private-key-path}")
     private String jwtPublicKeyPath;
-    @Value("${application.security.jwt.public-key-path}")
     private String jwtPrivateKeyPath;
-
+    @Value("${application.security.jwt.keys-dir}")
+    private String keysDir;
     private KeyPair keyPair;
 
+
     public KeyPair getKeyPair() {
-        if (keyPair == null)
+
+
+        if (keyPair == null){
+            File d = new File(keysDir);
+            if (!d.exists()) {
+                d.mkdir();
+            }
+            this.jwtPublicKeyPath = keysDir + "/public.pem";
+            this.jwtPrivateKeyPath = keysDir + "/private.pem";
             keyPair = getKeyPair(jwtPublicKeyPath, jwtPrivateKeyPath);
+        }
         return keyPair;
     }
 
@@ -38,6 +47,7 @@ public class KeyPairLoader {
     }
 
     public KeyPairLoader() {
+
     }
 
     public RSAPublicKey getJWTPublicKey(){
@@ -125,6 +135,7 @@ public class KeyPairLoader {
         writeEncoded(file, encoded, PRIVATE_KEY_BEGIN, PRIVATE_KEY_END);
 
     }
+
 
 
 

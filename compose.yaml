@@ -41,7 +41,6 @@ services:
         volumes:
             - ./container/redis/data:/data
             - ./container/redis/redis.conf:/usr/local/etc/redis/redis.conf
-        command: bash -c "redis-server --requirepass redis"
     mail-dev:
         container_name: soundify-mail-dev
         image: maildev/maildev
@@ -66,15 +65,11 @@ services:
             - MINIO_ROOT_PASSWORD=soundify
         command: server --console-address ":9001" /data
     backend:
+#        build:
+#            context: .  # Assuming Dockerfile is in the root directory
+#            dockerfile: Dockerfile
         container_name: soundify-app
-        build:
-            context: .  # Assuming Dockerfile is in the root directory
-            dockerfile: Dockerfile
-        depends_on:
-            - mysql
-            - redis
-            - elasticsearch
-            - minio
+        image: 'iamjakhang/soundify:latest'
         networks:
             - soundify-net
         environment:
@@ -87,6 +82,8 @@ services:
             - SPRING_MINIO_ENDPOINT=http://soundify-minio:9000
             - SPRING_MINIO_ACCESS_KEY=soundify
             - SPRING_MINIO_SECRET_KEY=soundify
+            - JWT_PUBLIC_KEY_PATH=D:/Workspace/full-stack/soundify.com/soundify-server/keys/jwt-public.pem
+            - JWT_PRIVATE_KEY_PATH=D:/Workspace/full-stack/soundify.com/soundify-server/keys/jwt-private.pem
         ports:
             - "8080:8080"
         volumes:

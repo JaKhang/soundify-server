@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @AllArgsConstructor
-@RequestMapping("/api/v1/test")
+@RequestMapping("/v1/test")
 @RestController
 public class TestController {
     private final StringRedisTemplate redisTemplate;
