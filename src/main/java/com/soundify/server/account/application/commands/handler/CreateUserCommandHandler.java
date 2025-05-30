@@ -1,6 +1,7 @@
 package com.soundify.server.account.application.commands.handler;
 
 import com.soundify.server.account.application.commands.CreateUserCommand;
+import com.soundify.server.account.application.exceptions.EmailAlreadyExistsException;
 import com.soundify.server.account.domain.models.Account;
 import com.soundify.server.account.domain.models.AccountDomainRepository;
 import com.soundify.server.shared.domain.Id;
@@ -25,6 +26,10 @@ public class CreateUserCommandHandler implements RequestHandler<CreateUserComman
     @Override
     public Id handle(CreateUserCommand command) {
         validateCommand(command);
+        if (accountRepository.existsByEmail(command.email()))
+            throw new EmailAlreadyExistsException(command.email());
+
+
         String encodedPassword = passwordEncoder.encode(command.password());
         Account account = new Account(
                 Id.fast(),
