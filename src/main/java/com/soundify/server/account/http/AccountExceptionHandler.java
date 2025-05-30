@@ -1,6 +1,7 @@
 package com.soundify.server.account.http;
 
 
+import com.soundify.server.account.application.exceptions.EmailAlreadyExistsException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -73,8 +74,13 @@ public class AccountExceptionHandler {
     }
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<ErrorResponse> handleDisDeniedException(DisabledException ex) {
-        ErrorResponse response = new ErrorResponse(1008, ex.getMessage(), "Disabled Account", null);
+        ErrorResponse response = new ErrorResponse(1009, ex.getMessage(), "Disabled Account", null);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleEmailAlready(EmailAlreadyExistsException ex) {
+        ErrorResponse response = new ErrorResponse(1010, ex.getMessage(), "Email already exists", null);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
 }

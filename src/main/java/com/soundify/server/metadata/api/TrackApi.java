@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -18,7 +19,8 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/tracks")
+@RequestMapping("/v1/catalog/tracks")
+
 public class TrackApi {
     TrackService trackService;
 
@@ -36,6 +38,7 @@ public class TrackApi {
 
     @PostMapping
     @ResponseBody
+    @PostAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> createTrack(@RequestBody @Valid TrackRequest trackRequest, UriComponentsBuilder uriBuilder) {
         // TODO: Change to 501 NOT IMPLEMENTED (create exception in base branch)
         Id id = trackService.create(trackRequest);
@@ -49,6 +52,8 @@ public class TrackApi {
 
     @PutMapping("/{id}")
     @ResponseBody
+    @PostAuthorize("hasRole('ADMIN')")
+
     public ResponseEntity<Void> updateTrack(@PathVariable Id id, @RequestBody @Valid TrackRequest trackRequest) {
         trackService.update(id, trackRequest);
         return ResponseEntity.noContent().build();
@@ -56,6 +61,8 @@ public class TrackApi {
 
     @DeleteMapping("/{id}")
     @ResponseBody
+    @PostAuthorize("hasRole('ADMIN')")
+
     public ResponseEntity<Void> deleteTrack(@PathVariable Id id) {
         trackService.delete(id);
         return ResponseEntity.noContent().build();

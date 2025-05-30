@@ -25,6 +25,10 @@ public class CreateUserCommandHandler implements RequestHandler<CreateUserComman
     @Override
     public Id handle(CreateUserCommand command) {
         validateCommand(command);
+        if (accountRepository.existsByEmail(command.email()))
+            throw new EmailAlreadyExistsException(command.email());
+
+
         String encodedPassword = passwordEncoder.encode(command.password());
         Account account = new Account(
                 Id.fast(),

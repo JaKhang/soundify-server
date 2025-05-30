@@ -11,6 +11,7 @@ import com.soundify.server.shared.domain.Id;
 import com.soundify.server.shared.mediator.Mediator;
 import com.soundify.server.shared.security.Principal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -29,7 +30,12 @@ import java.util.Set;
 public class AccountApi {
     private final Mediator gateway;
 
-
+    @Value("${application.security.cookie.same-site}")
+    private String sameSite;
+    @Value("${application.security.cookie.secure}")
+    private boolean secure;
+    @Value("${application.security.cookie.http-only}")
+    private boolean httpOnly;
     @GetMapping("")
     public String test() {
         return "account";
@@ -57,7 +63,9 @@ public class AccountApi {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                 .path("/")
                 .maxAge(Duration.ZERO)
-
+                .sameSite(sameSite)
+                .secure(secure)
+                .httpOnly(httpOnly)
                 .build();
 
         gateway.send(new LogoutCommand(principal));
