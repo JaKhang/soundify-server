@@ -24,6 +24,7 @@ public class KeyPairLoader {
     @Value("${application.security.jwt.public-key-path}")
     private String jwtPrivateKeyPath;
 
+    @Value("${application.security.jwt.keys-dir}")
     private KeyPair keyPair;
 
     public KeyPair getKeyPair() {
