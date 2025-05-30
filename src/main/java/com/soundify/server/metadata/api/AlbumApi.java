@@ -18,8 +18,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/albums")
-@PostAuthorize("isAnonymous()")
+@RequestMapping("/v1/catalog/albums")
 public class AlbumApi {
     AlbumService albumService;
 

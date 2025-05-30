@@ -51,7 +51,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(configurer -> configurer
                         .requestMatchers(
                                 "/v1/auth/**",
-                                "/v1/auth",
                                 "/v1/test/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -59,7 +58,8 @@ public class SecurityConfig {
                                 "/ws/**",
                                 "/ws",
                                 "/oauth2/**",
-                                "/login/oauth2/**")
+                                "/login/oauth2/**",
+                                "/v1/catalog/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
