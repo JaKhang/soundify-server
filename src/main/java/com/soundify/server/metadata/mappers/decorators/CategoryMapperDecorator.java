@@ -4,6 +4,7 @@ import com.soundify.server.metadata.dto.category.CategoryRequest;
 import com.soundify.server.metadata.entities.Album;
 import com.soundify.server.metadata.entities.Category;
 import com.soundify.server.metadata.mappers.CategoryMapper;
+import com.soundify.server.metadata.mappers.LocaleConverter;
 import com.soundify.server.metadata.repositories.AlbumRepository;
 import com.soundify.server.metadata.repositories.CategoryRepository;
 import com.soundify.server.shared.domain.Id;
@@ -23,13 +24,16 @@ public abstract class CategoryMapperDecorator implements CategoryMapper {
     @Autowired
     CategoryRepository categoryRepository;
 
+    @Autowired
+    LocaleConverter localeConverter;
+
     @Override
     public Category createCategory(CategoryRequest categoryRequest) {
         List<Album> listAlbum = albumRepository.findAllById(categoryRequest.albumIds());
 
         return Category.builder()
                 .name(categoryRequest.name())
-                .locale(localeTagToLocale(categoryRequest.localeTag()))
+                .locale(localeConverter.localeTagToLocale(categoryRequest.localeTag()))
                 .icons(categoryRequest.icons())
                 .orderBy(categoryRequest.order())
                 .albums(new HashSet<>(listAlbum))
@@ -47,10 +51,11 @@ public abstract class CategoryMapperDecorator implements CategoryMapper {
         return Category.builder()
                 .id(existingCategory.getId())
                 .name(categoryRequest.name())
-                .locale(localeTagToLocale(categoryRequest.localeTag()))
+                .locale(localeConverter.localeTagToLocale(categoryRequest.localeTag()))
                 .icons(categoryRequest.icons())
                 .orderBy(categoryRequest.order())
                 .albums(new HashSet<>(listAlbum))
+                .deleted(existingCategory.isDeleted())
                 .createdAt(existingCategory.getCreatedAt())
                 .build();
     }

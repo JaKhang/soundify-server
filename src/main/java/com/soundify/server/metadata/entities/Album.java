@@ -40,7 +40,7 @@ public class Album extends AbstractEntity {
     @Column(nullable = false)
     Locale locale;
     @ElementCollection
-    Set<Locale> notAvailableLocales = Set.of();
+    Set<Locale> notAvailableLocales = new HashSet<>();
     @OneToMany(mappedBy = "album", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     List<Track> tracks = new ArrayList<>();
     @ColumnDefault("false")

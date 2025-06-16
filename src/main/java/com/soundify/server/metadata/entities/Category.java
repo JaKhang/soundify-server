@@ -17,7 +17,7 @@ import java.util.Set;
 
 @FieldDefaults(level = AccessLevel.PACKAGE)
 @Entity
-@Table(name = "category")
+@Table(name = "category_metadata")
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor

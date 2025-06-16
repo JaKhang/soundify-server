@@ -11,11 +11,11 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {AlbumMapper.class})
+@Mapper(componentModel = "spring", uses = {AlbumMapper.class, LocaleConverter.class})
 @DecoratedWith(CategoryMapperDecorator.class)
-public interface CategoryMapper extends LocaleConverter {
+public interface CategoryMapper {
 
-    @Mapping(source = "locale", target = "localeTag", qualifiedByName = "localeToLocalTag")
+    @Mapping(source = "locale", target = "localeTag", qualifiedByName = {"localeToLocalTag"})
     CategoryResponse toCategoryResponse(Category category);
 
     @Mapping(source = "locale", target = "localeTag", qualifiedByName = "localeToLocalTag")

@@ -7,6 +7,7 @@ import com.soundify.server.metadata.entities.Album;
 import com.soundify.server.metadata.entities.Artist;
 import com.soundify.server.metadata.entities.Track;
 import com.soundify.server.metadata.mappers.AlbumMapper;
+import com.soundify.server.metadata.mappers.LocaleConverter;
 import com.soundify.server.metadata.repositories.AlbumRepository;
 import com.soundify.server.metadata.repositories.ArtistRepository;
 import com.soundify.server.metadata.repositories.TrackRepository;
@@ -16,9 +17,11 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class AlbumMapperDecorator implements AlbumMapper {
@@ -31,6 +34,9 @@ public abstract class AlbumMapperDecorator implements AlbumMapper {
 
     @Autowired
     TrackRepository trackRepository;
+
+    @Autowired
+    LocaleConverter localeConverter;
 
     @Override
     public Album createAlbumFromRequest(AlbumRequest request) {
@@ -48,13 +54,16 @@ public abstract class AlbumMapperDecorator implements AlbumMapper {
                 .label(request.label())
                 .popularity(request.popularity())
                 .artists(artists)
-                .locale(albumLocaleTagToLocale(request.localeTag()))
+                .locale(localeConverter.localeTagToLocale(request.localeTag()))
+                .notAvailableLocales(request.notAvailableLocaleTags()
+                        .stream()
+                        .map(localeConverter::localeTagToLocale)
+                        .collect(Collectors.toSet()))
                 .tracks(tracks)
                 .explicit(request.explicit())
                 .genres(request.genres())
                 .images(request.images())
                 .deleted(request.deleted())
-                .createdAt(LocalDateTime.now())
                 .build();
 
         // Create new Track base on albumId, update each of track in tracks (reference)
@@ -70,7 +79,6 @@ public abstract class AlbumMapperDecorator implements AlbumMapper {
                     .artists(artists)
                     .genres(trackRequest.genres())
                     .deleted(trackRequest.deleted())
-                    .createdAt(LocalDateTime.now())
                     .build();
 
             tracks.add(track);
@@ -88,6 +96,13 @@ public abstract class AlbumMapperDecorator implements AlbumMapper {
 
         List<Track> tracks = trackRepository.findAllById(request.trackIds());
 
+        Set<Locale> notAvailableLocales = existingAlbum.getNotAvailableLocales();
+        notAvailableLocales.clear();
+        notAvailableLocales.addAll(request.notAvailableLocaleTags()
+                .stream()
+                .map(localeConverter::localeTagToLocale)
+                .collect(Collectors.toSet()));
+
         return Album.builder()
                 .id(existingAlbum.getId())  // Giữ nguyên ID
                 .name(request.name())
@@ -96,13 +111,14 @@ public abstract class AlbumMapperDecorator implements AlbumMapper {
                 .label(request.label())
                 .popularity(request.popularity())
                 .artists(artists)
-                .locale(albumLocaleTagToLocale(request.localeTag()))
+                .locale(localeConverter.localeTagToLocale(request.localeTag()))
+                .notAvailableLocales(notAvailableLocales)
                 .tracks(tracks)  // Danh sách tracks rỗng, sẽ được cập nhật sau
                 .explicit(request.explicit())
                 .genres(request.genres())
                 .images(request.images())
                 .deleted(request.deleted())
-                .createdAt(LocalDateTime.now())
+                .createdAt(existingAlbum.getCreatedAt())
                 .build();
     }
 }
