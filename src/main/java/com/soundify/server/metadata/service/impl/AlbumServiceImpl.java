@@ -1,11 +1,11 @@
 package com.soundify.server.metadata.service.impl;
 
-import com.soundify.server.metadata.dto.album.AlbumRequest;
 import com.soundify.server.metadata.dto.album.AlbumResponse;
-import com.soundify.server.metadata.dto.album.AlbumUpdateRequest;
-import com.soundify.server.metadata.entities.Album;
+import com.soundify.server.metadata.dto.track.TrackResponse;
 import com.soundify.server.metadata.mappers.AlbumMapper;
+import com.soundify.server.metadata.mappers.TrackMapper;
 import com.soundify.server.metadata.repositories.AlbumRepository;
+import com.soundify.server.metadata.repositories.TrackRepository;
 import com.soundify.server.metadata.service.AlbumService;
 import com.soundify.server.shared.domain.Id;
 import com.soundify.server.shared.exceptions.ResourceNotFoundException;
@@ -22,6 +22,8 @@ import java.util.List;
 public class AlbumServiceImpl implements AlbumService {
     AlbumRepository albumRepository;
     AlbumMapper albumMapper;
+    TrackRepository trackRepository;
+    TrackMapper trackMapper;
 
     @Override
     public AlbumResponse getById(Id id) {
@@ -37,19 +39,22 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public Id create(AlbumRequest albumRequest) {
-        Album album = albumMapper.createAlbumFromRequest(albumRequest);
-        return albumRepository.save(album).getId();
+    public Id create(AlbumResponse albumResponse) {
+        return null;
     }
 
     @Override
-    public void update(Id id, AlbumUpdateRequest albumUpdateRequest) {
-        Album album = albumMapper.updateAlbumFromRequest(id, albumUpdateRequest);
-        albumRepository.save(album);
+    public void update(Id id, AlbumResponse albumResponse) {
+
     }
 
     @Override
     public void delete(Id id) {
-        albumRepository.deleteById(id);
+        
+    }
+
+    @Override
+    public List<TrackResponse> getTracks(Id id) {
+        return trackMapper.toTrackResponses(trackRepository.findByAlbumId(id));
     }
 }

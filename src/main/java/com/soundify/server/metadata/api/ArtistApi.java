@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -18,7 +19,9 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/v1/artists")
+@PostAuthorize("isAnonymous()")
+
+@RequestMapping("/v1/catalog/artists")
 public class ArtistApi {
     ArtistService artistService;
 
@@ -28,11 +31,14 @@ public class ArtistApi {
     }
 
     @GetMapping
+
     public ResponseEntity<List<ArtistResponse>> getArtistsByIds(@RequestParam List<Id> ids) {
         return ResponseEntity.ok(artistService.getByIds(ids));
     }
 
     @PostMapping
+    @PostAuthorize("hasRole('ADMIN')")
+
     public ResponseEntity<Void> createArtist(@RequestBody @Valid ArtistRequest artistRequest, UriComponentsBuilder uriBuilder) {
         Id id = artistService.create(artistRequest);
         URI uri = uriBuilder
@@ -43,6 +49,8 @@ public class ArtistApi {
     }
 
     @PutMapping("/{id}")
+    @PostAuthorize("hasRole('ADMIN')")
+
     public ResponseEntity<Void> updateArtist(@PathVariable Id id, @RequestBody @Valid ArtistRequest artistRequest) {
         artistService.update(id, artistRequest);
         return ResponseEntity.noContent().build();

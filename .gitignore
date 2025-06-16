@@ -5,6 +5,8 @@ out/
 bin/
 !gradle-wrapper.jar
 
+/key
+
 # IntelliJ IDEA
 .idea/
 *.iml
