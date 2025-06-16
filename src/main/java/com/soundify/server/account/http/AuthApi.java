@@ -18,8 +18,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.server.Cookie;
-import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -47,6 +45,12 @@ public class AuthApi {
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
     @Value("${spring.profiles.active}")
     private String profile;
+    @Value("${application.security.cookie.same-site}")
+    private String sameSite;
+    @Value("${application.security.cookie.secure}")
+    private boolean secure;
+    @Value("${application.security.cookie.http-only}")
+    private boolean httpOnly;
 
     @PostMapping("/authenticate")
     public ResponseEntity<TokenResponse> authenticate(
@@ -68,11 +72,11 @@ public class AuthApi {
 
 
         ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, response.refreshToken().token())
-                .httpOnly(true)
-                .secure(!profile.equals(DEV_PROFILE))
+                .httpOnly(httpOnly)
+                .secure(secure)
                 .path("/")
-                .sameSite(Cookie.SameSite.LAX.attributeValue()) // Quan trọng nếu frontend và backend ở domain khác nhau
                 .maxAge(response.age())
+                .sameSite(sameSite)
                 .build();
 
         return ResponseEntity.ok()
