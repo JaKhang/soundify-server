@@ -19,17 +19,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PROTECTED)
 public abstract class TrackMapperDecorator implements TrackMapper {
 
     @Autowired
-    protected TrackRepository trackRepository;
+    TrackRepository trackRepository;
 
     @Autowired
-    protected AlbumRepository albumRepository;
+    AlbumRepository albumRepository;
 
     @Autowired
-    protected ArtistRepository artistRepository;
+    ArtistRepository artistRepository;
 
     @Override
     public Track updateTrackFromRequest(Id id, TrackRequest trackRequest) {

@@ -28,7 +28,6 @@ public class AlbumApi {
     }
 
     @GetMapping("/{id}/tracks")
-
     public ResponseEntity<?> getTrack(@PathVariable Id id) {
         return ResponseEntity.ok(albumService.getTracks(id));
     }

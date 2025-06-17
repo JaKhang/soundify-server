@@ -13,6 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {AlbumMapper.class, ArtistMapper.class, LocaleConverter.class})
 @DecoratedWith(TrackMapperDecorator.class)
 public interface TrackMapper {
+
     TrackResponse toTrackResponse(Track track);
 
     List<TrackResponse> toTrackResponses(List<Track> tracks);

@@ -8,6 +8,15 @@ import com.soundify.server.shared.domain.Id;
 import java.util.List;
 import java.util.Set;
 
-public record TrackResponse(Id id, String name, long duration, boolean explicit, boolean playable, int popularity,
-                            AlbumResponse album, List<ArtistResponse> artists, Set<Genre> genres) {
+public record TrackResponse(
+        Id id,
+        String name,
+        long duration,
+        boolean explicit,
+        boolean playable,
+        int popularity,
+        AlbumResponse album,
+        List<ArtistResponse> artists,
+        Set<Genre> genres
+) {
 }

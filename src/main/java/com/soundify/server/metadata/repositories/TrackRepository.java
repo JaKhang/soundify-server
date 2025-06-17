@@ -13,15 +13,27 @@ import java.util.List;
 
 @Repository
 public interface TrackRepository extends JpaRepository<Track, Id> {
-    List<Track> findByAlbumId(Id albumId);
+    @Query("""
+            SELECT t FROM Track t
+            LEFT JOIN FETCH t.artists ta
+            LEFT JOIN FETCH t.album
+            WHERE t.album.id = :albumId
+            """)
+    List<Track> findByAlbumId(@Param("albumId") Id albumId);
 
     @Query("""
         SELECT DISTINCT t FROM Track t
         LEFT JOIN FETCH t.album a
         LEFT JOIN FETCH t.artists ar
-        WHERE LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%'))
-           OR LOWER(a.name) LIKE LOWER(CONCAT('%', :query, '%'))
-           OR LOWER(ar.name) LIKE LOWER(CONCAT('%', :query, '%'))
+        WHERE t.name LIKE CONCAT('%', :query, '%')
         """)
     Page<Track> searchTracks(@Param("query") String query, Pageable pageable);
+
+    @Query("""
+            SELECT t FROM Track t
+            LEFT JOIN FETCH t.artists ta
+            LEFT JOIN FETCH t.album
+            WHERE ta.id = :id
+            """)
+    List<Track> findByArtistId(Id id);
 }

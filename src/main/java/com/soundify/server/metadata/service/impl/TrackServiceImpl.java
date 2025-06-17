@@ -27,7 +27,6 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public TrackResponse getById(Id id) {
-        // Throw temp exception
         return trackMapper.toTrackResponse(trackRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Track not found")));
@@ -36,6 +35,16 @@ public class TrackServiceImpl implements TrackService {
     @Override
     public List<TrackResponse> getByIds(@NotNull List<Id> ids) {
         return trackMapper.toTrackResponses(trackRepository.findAllById(ids));
+    }
+
+    @Override
+    public List<TrackResponse> getByArtistId(Id id) {
+        return trackMapper.toTrackResponses(trackRepository.findByArtistId(id));
+    }
+
+    @Override
+    public List<Track> findByAlbumId(Id id) {
+        return trackRepository.findByAlbumId(id);
     }
 
     @Transactional

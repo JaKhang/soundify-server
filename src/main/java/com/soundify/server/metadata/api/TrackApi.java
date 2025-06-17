@@ -1,7 +1,9 @@
 package com.soundify.server.metadata.api;
 
+import com.soundify.server.metadata.dto.album.AlbumResponse;
 import com.soundify.server.metadata.dto.track.TrackRequest;
 import com.soundify.server.metadata.dto.track.TrackResponse;
+import com.soundify.server.metadata.service.AlbumService;
 import com.soundify.server.metadata.service.TrackService;
 import com.soundify.server.shared.domain.Id;
 import jakarta.validation.Valid;
@@ -20,14 +22,20 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/catalog/tracks")
-
 public class TrackApi {
     TrackService trackService;
+    AlbumService albumService;
 
     @GetMapping("/{id}")
     @ResponseBody
     public ResponseEntity<TrackResponse> getTrackById(@PathVariable Id id) {
         return ResponseEntity.ok(trackService.getById(id));
+    }
+
+    @GetMapping("/{id}/album")
+    @ResponseBody
+    public ResponseEntity<AlbumResponse> getAlbumByTrackId(@PathVariable Id id) {
+        return ResponseEntity.ok(albumService.getByTrackId(id));
     }
 
     @GetMapping

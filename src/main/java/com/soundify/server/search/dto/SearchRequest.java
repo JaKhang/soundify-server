@@ -17,7 +17,7 @@ public record SearchRequest(
     public SearchRequest {
         if (page == null || page < 0) page = 0;
         if (size == null || size < 1) size = 10;
-        if (sortBy == null || sortBy.isBlank()) sortBy = "created_at";
+        if (sortBy == null || sortBy.isBlank()) sortBy = "popularity";
         if (sortDir == null || sortDir.isBlank()) sortDir = "DESC";
     }
 
@@ -40,6 +40,9 @@ public record SearchRequest(
     }
 
     public String getCleanQuery() {
+        if (this.query == null || this.query.isBlank()) {
+            return null;
+        }
         return this.query.trim().toLowerCase();
     }
 }

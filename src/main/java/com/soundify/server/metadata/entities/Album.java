@@ -6,10 +6,7 @@ import com.soundify.server.shared.data.Genre;
 import com.soundify.server.shared.data.Image;
 import com.soundify.server.shared.domain.AbstractEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
@@ -24,6 +21,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 public class Album extends AbstractEntity {
     @Column(nullable = false)
     String name;
@@ -51,4 +49,10 @@ public class Album extends AbstractEntity {
     Set<Image> images = new HashSet<>();
     @ElementCollection
     Set<Copyright> copyrights = new HashSet<>();
+
+    public void setTracks(List<Track> sendingTracks) {
+        // Set các track bằng cách add để tránh thay đổi reference
+        tracks.clear();
+        tracks.addAll(sendingTracks);
+    }
 }

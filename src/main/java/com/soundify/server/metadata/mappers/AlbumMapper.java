@@ -14,17 +14,14 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {ArtistMapper.class, LocaleConverter.class})
 @DecoratedWith(AlbumMapperDecorator.class)
-public interface AlbumMapper  {
+public interface AlbumMapper {
 
     @Mapping(source = "locale", target = "localeTag", qualifiedByName = "localeToLocalTag")
     @Mapping(source = "notAvailableLocales", target = "notAvailableLocaleTags", qualifiedByName = "notAvailableToNotAvailableTag")
     AlbumResponse toAlbumResponse(Album album);
 
-    @Mapping(source = "locale", target = "localeTag", qualifiedByName = "localeToLocalTag")
-    @Mapping(source = "notAvailableLocales", target = "notAvailableLocaleTags", qualifiedByName = "notAvailableToNotAvailableTag")
     List<AlbumResponse> toAlbumResponses(List<Album> albums);
 
     Album createAlbumFromRequest(AlbumRequest request);
-
     Album updateAlbumFromRequest(Id id, AlbumUpdateRequest request);
 }

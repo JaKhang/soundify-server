@@ -2,7 +2,9 @@ package com.soundify.server.metadata.api;
 
 import com.soundify.server.metadata.dto.artist.ArtistRequest;
 import com.soundify.server.metadata.dto.artist.ArtistResponse;
+import com.soundify.server.metadata.dto.track.TrackResponse;
 import com.soundify.server.metadata.service.ArtistService;
+import com.soundify.server.metadata.service.TrackService;
 import com.soundify.server.shared.domain.Id;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -19,19 +21,22 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @RestController
-@PostAuthorize("isAnonymous()")
-
 @RequestMapping("/v1/catalog/artists")
 public class ArtistApi {
     ArtistService artistService;
+    TrackService trackService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ArtistResponse> getArtistById(@PathVariable Id id) {
         return ResponseEntity.ok(artistService.getById(id));
     }
 
-    @GetMapping
+    @GetMapping("/{id}/tracks")
+    public ResponseEntity<List<TrackResponse>> getTracksByArtistId(@PathVariable Id id) {
+        return ResponseEntity.ok(trackService.getByArtistId(id));
+    }
 
+    @GetMapping
     public ResponseEntity<List<ArtistResponse>> getArtistsByIds(@RequestParam List<Id> ids) {
         return ResponseEntity.ok(artistService.getByIds(ids));
     }
